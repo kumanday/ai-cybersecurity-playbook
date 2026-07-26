@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>The AI Cybersecurity Playbook | Trilogy AI Center of Excellence</title>
+<meta name="description" content="Practical controls, agentic testing, incident workflows, and open-weight model patterns for defensive cybersecurity."/>
+<meta property="og:title" content="The AI Cybersecurity Playbook"/>
+<meta property="og:description" content="Practical controls, agentic testing, incident workflows, and open-weight model patterns for defensive cybersecurity."/>
+<style>
+
+:root {
+  color-scheme: light;
+  --ink: #17211f;
+  --muted: #5d6965;
+  --paper: #f6f7f2;
+  --panel: #fffdf8;
+  --panel-2: #eef4ef;
+  --line: #d6ded7;
+  --teal: #0f766e;
+  --teal-dark: #104f4b;
+  --amber: #b7791f;
+  --blue: #2d5f93;
+  --shadow: 0 22px 58px rgba(23, 33, 31, 0.10);
+  --radius: 8px;
+  --mono: "SFMono-Regular", "Cascadia Code", "Liberation Mono", Menlo, monospace;
+  --sans: "Avenir Next", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --serif: Georgia, "Times New Roman", serif;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background:
+    linear-gradient(90deg, rgba(23,33,31,0.032) 1px, transparent 1px),
+    linear-gradient(rgba(23,33,31,0.028) 1px, transparent 1px),
+    var(--paper);
+  background-size: 34px 34px;
+  color: var(--ink);
+  font-family: var(--sans);
+  line-height: 1.58;
+}
+a { color: var(--teal-dark); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+.hero {
+  min-height: 62vh;
+  padding: 44px clamp(22px, 4vw, 72px) 28px;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  border-bottom: 1px solid var(--line);
+  background:
+    linear-gradient(135deg, rgba(15,118,110,0.13), transparent 42%),
+    linear-gradient(315deg, rgba(183,121,31,0.12), transparent 38%),
+    #fbfcf8;
+}
+.hero-top, .hero-bottom {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: flex-start;
+  color: var(--muted);
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+.hero-bottom { align-items: center; font-size: 14px; text-transform: none; letter-spacing: 0; }
+.kicker { color: var(--teal-dark); font-weight: 800; }
+.version-pill {
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,0.72);
+  padding: 8px 12px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.hero-main { align-self: center; max-width: 1040px; }
+h1 {
+  font-family: var(--serif);
+  font-size: clamp(40px, 6vw, 58px);
+  line-height: 1.04;
+  letter-spacing: 0;
+  max-width: 920px;
+  margin: 34px 0 20px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+.hero-summary {
+  max-width: 880px;
+  font-size: clamp(18px, 2vw, 22px);
+  color: #31413d;
+  margin: 0 0 34px;
+}
+.meta-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  max-width: 720px;
+}
+.meta-card {
+  background: rgba(255,255,255,0.82);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 16px;
+  min-height: 106px;
+  box-shadow: 0 8px 28px rgba(23,33,31,.06);
+}
+.meta-card strong { display: block; font-size: 12px; color: var(--teal-dark); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 8px; }
+.meta-card span { color: #354540; overflow-wrap: anywhere; }
+.layout {
+  display: grid;
+  grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
+  gap: clamp(20px, 3vw, 44px);
+  max-width: 1880px;
+  margin: 0 auto;
+  padding: 36px clamp(18px, 3vw, 46px) 90px;
+}
+.sidebar {
+  position: sticky;
+  top: 20px;
+  align-self: start;
+  max-height: calc(100vh - 40px);
+  overflow: auto;
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,.86);
+  backdrop-filter: blur(12px);
+  border-radius: var(--radius);
+  padding: 18px;
+  box-shadow: 0 12px 32px rgba(23,33,31,.07);
+}
+.sidebar h2 {
+  margin: 0 0 14px;
+  font-family: var(--sans);
+  font-size: 13px;
+  text-transform: uppercase;
+  color: var(--teal-dark);
+  letter-spacing: .12em;
+}
+.sidebar nav { display: flex; flex-direction: column; gap: 4px; }
+.nav-link {
+  display: block;
+  padding: 7px 8px;
+  color: #31413d;
+  text-decoration: none;
+  font-size: 13px;
+  border-radius: 6px;
+}
+.nav-link:hover { background: var(--panel-2); color: var(--teal-dark); }
+.nav-link.level-3 { padding-left: 22px; color: var(--muted); font-size: 12px; }
+.toc-overview {
+  padding-bottom: 8px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--line);
+}
+.toc-part { border-radius: 6px; }
+.toc-part__header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 30px;
+  gap: 4px;
+  align-items: center;
+  border-radius: 6px;
+}
+.toc-part__link {
+  display: block;
+  padding: 8px;
+  color: #243430;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.35;
+  border-radius: 6px;
+}
+.toc-part__link:hover, .toc-part__toggle:hover { background: var(--panel-2); color: var(--teal-dark); }
+.toc-part__toggle {
+  width: 30px;
+  height: 30px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+.toc-part__toggle span {
+  display: block;
+  transition: transform 140ms ease;
+}
+.toc-part__toggle[aria-expanded="true"] span { transform: rotate(90deg); }
+.toc-part__sections {
+  padding: 2px 0 8px 9px;
+  margin: 0 0 3px 8px;
+  border-left: 1px solid var(--line);
+}
+.toc-part__sections .nav-link { padding-left: 10px; }
+.toc-part__sections .nav-link.level-3 { padding-left: 22px; }
+.nav-link.is-active, .toc-part__link.is-active {
+  background: #dcece6;
+  color: var(--teal-dark);
+  font-weight: 700;
+  box-shadow: inset 3px 0 0 var(--teal);
+}
+.toc-part.is-current > .toc-part__header { background: rgba(15,118,110,.06); }
+.toc-part.is-current .toc-part__toggle { color: var(--teal-dark); }
+.toc-part__toggle:focus-visible, .toc-part__link:focus-visible, .nav-link:focus-visible {
+  outline: 3px solid rgba(15,118,110,.24);
+  outline-offset: 2px;
+}
+.toc-empty { color: var(--muted); font-size: 13px; }
+.main { min-width: 0; }
+.article {
+  min-width: 0;
+  background: rgba(255,253,248,.95);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: clamp(22px, 4vw, 56px);
+}
+.article h1 { font-size: clamp(32px, 4vw, 48px); margin-top: 0; }
+.article h2 {
+  font-family: var(--serif);
+  font-size: clamp(28px, 3.1vw, 44px);
+  line-height: 1.08;
+  margin: 64px 0 18px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+}
+.article h3 { font-size: clamp(20px, 2vw, 27px); margin: 34px 0 12px; color: var(--teal-dark); }
+.article h4 { font-size: 17px; margin: 24px 0 10px; }
+.article p, .article li { font-size: 16px; overflow-wrap: break-word; }
+.article a { overflow-wrap: anywhere; }
+.article img { display: block; max-width: 100%; height: auto; margin: 24px auto 28px; border: 1px solid var(--line); border-radius: var(--radius); box-shadow: 0 10px 28px rgba(23,33,31,.08); }
+.article .plotly-figure, .article .plotly-static-figure { margin: 28px 0 34px; padding: 12px; background: #fff; border: 1px solid var(--line); border-radius: var(--radius); box-shadow: 0 10px 28px rgba(23,33,31,.08); }
+.article .plotly-chart { width: 100%; min-height: 390px; }
+.article .plotly-figure img, .article .plotly-static-figure img { margin: 0 auto; box-shadow: none; }
+.article .plotly-figure .plotly-fallback[hidden] { display: none; }
+.article .plotly-figure figcaption, .article .plotly-static-figure figcaption { margin: 10px 6px 2px; color: var(--muted); font-size: 13px; text-align: center; }
+.article .plotly-unavailable { color: var(--muted); font-size: 14px; text-align: center; }
+.article > p:first-of-type { font-size: 18px; }
+.article table { width: 100%; border-collapse: collapse; margin: 20px 0 28px; font-size: 14px; background:#fff; border:1px solid var(--line); }
+.article th { text-align: left; background: #eaf1ed; color: #20312d; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; }
+.article th, .article td { border-bottom: 1px solid var(--line); padding: 11px 12px; vertical-align: top; overflow-wrap: break-word; }
+.article th:first-child, .article td:first-child { white-space: nowrap; }
+.article tr:last-child td { border-bottom: 0; }
+.article code {
+  font-family: var(--mono);
+  font-size: .9em;
+  background: #eef3ef;
+  color: #0d4f49;
+  border: 1px solid #d7e4de;
+  padding: 2px 5px;
+  border-radius: 5px;
+}
+.article pre {
+  margin: 18px 0 28px;
+  padding: 18px;
+  background: #17211f;
+  color: #e7f1ec;
+  border-radius: var(--radius);
+  overflow-x: auto;
+  max-width: 100%;
+  border: 1px solid #263c36;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.04);
+}
+.article pre code {
+  display: block;
+  min-width: 0;
+  background: transparent;
+  color: inherit;
+  border: 0;
+  padding: 0;
+  font-size: 13px;
+}
+.article blockquote { margin: 24px 0; padding: 14px 18px; border-left: 5px solid var(--amber); background: #fff8e9; color: #3f3524; }
+.article hr { border: 0; border-top: 1px solid var(--line); margin: 36px 0; }
+.article .page-break { display: none; }
+.article ul, .article ol { padding-left: 24px; }
+.article li + li { margin-top: 5px; }
+.footnote-ref {
+  font-size: .72em;
+  line-height: 1;
+  margin-left: 1px;
+  vertical-align: super;
+}
+.footnote-ref a {
+  color: var(--teal-dark);
+  text-decoration: none;
+  font-weight: 600;
+}
+.footnote-ref a:hover { text-decoration: underline; }
+.footnote-separator {
+  color: var(--teal-dark);
+  font-size: .72em;
+  vertical-align: super;
+}
+.footnotes {
+  margin-top: 64px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+}
+.footnotes h2 {
+  margin-top: 0;
+}
+.footnotes ol {
+  padding-left: 22px;
+}
+.footnotes li {
+  color: #354540;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+.footnotes li + li {
+  margin-top: 12px;
+}
+.footnote-backref {
+  margin-left: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+.footer-note { margin-top: 28px; color: var(--muted); font-size: 13px; text-align: right; }
+.article .mermaid-figure {
+  margin: 22px calc(-1 * clamp(22px, 4vw, 56px)) 32px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: 0 12px 32px rgba(23,33,31,.07);
+  overflow: hidden;
+  position: relative;
+}
+.article .mermaid-viewport {
+  overflow: hidden;
+  padding: 14px;
+  cursor: zoom-in;
+  background:
+    linear-gradient(90deg, rgba(23,33,31,0.03) 1px, transparent 1px),
+    linear-gradient(rgba(23,33,31,0.025) 1px, transparent 1px),
+    #fff;
+  background-size: 28px 28px;
+}
+.article .mermaid-figure svg {
+  display: block;
+  min-width: 0;
+  width: 100%;
+  max-width: none;
+  height: auto;
+  margin: 0 auto;
+  transition: transform .18s ease;
+}
+.article .mermaid-figure:hover svg { transform: scale(1.015); }
+.article .mermaid-figure figcaption {
+  border-top: 1px solid var(--line);
+  background: #fbfcf8;
+  color: var(--muted);
+  font-size: 13px;
+  padding: 10px 52px 10px 14px;
+}
+.diagram-zoom-button {
+  position: absolute;
+  right: 12px;
+  bottom: 10px;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255,255,255,.96);
+  color: var(--teal-dark);
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity .18s ease, transform .18s ease, background .18s ease;
+  box-shadow: 0 8px 18px rgba(23,33,31,.12);
+}
+.mermaid-figure:hover .diagram-zoom-button, .diagram-zoom-button:focus-visible { opacity: 1; transform: translateY(0); }
+.diagram-zoom-button:hover { background: var(--panel-2); }
+.diagram-zoom-button::before {
+  content: "";
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+  left: 8px;
+  top: 7px;
+}
+.diagram-zoom-button::after {
+  content: "";
+  position: absolute;
+  width: 9px;
+  height: 2px;
+  background: currentColor;
+  transform: rotate(45deg);
+  left: 19px;
+  top: 21px;
+  border-radius: 2px;
+}
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+.modal-open { overflow: hidden; }
+.diagram-modal[hidden] { display: none; }
+.diagram-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  background:
+    linear-gradient(90deg, rgba(23,33,31,0.028) 1px, transparent 1px),
+    linear-gradient(rgba(23,33,31,0.024) 1px, transparent 1px),
+    #f6f7f2;
+  background-size: 32px 32px;
+}
+.diagram-modal__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--line);
+  background: #fffdf8;
+  box-shadow: 0 8px 28px rgba(23,33,31,.08);
+}
+.diagram-modal__title {
+  margin: 0;
+  color: var(--ink);
+  font-weight: 800;
+  font-size: 15px;
+}
+.diagram-modal__hint { color: var(--muted); font-size: 13px; }
+.diagram-modal__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.diagram-modal__control, .diagram-modal__close {
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--ink);
+  border-radius: 8px;
+  min-height: 34px;
+  padding: 7px 11px;
+  cursor: pointer;
+  font-weight: 800;
+  line-height: 1;
+}
+.diagram-modal__control:hover, .diagram-modal__close:hover { background: var(--panel-2); }
+.diagram-modal__control:focus-visible, .diagram-modal__close:focus-visible {
+  outline: 3px solid rgba(15,118,110,.2);
+  outline-offset: 2px;
+}
+.diagram-modal__zoom {
+  min-width: 58px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+}
+.diagram-modal__viewport {
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+  padding: 18px;
+  overscroll-behavior: contain;
+}
+.diagram-modal__canvas {
+  min-width: 100%;
+  min-height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.diagram-modal__canvas svg {
+  display: block;
+  width: auto;
+  max-width: none;
+  height: auto;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: 0 18px 44px rgba(23,33,31,.14);
+}
+.diagram-modal.is-zoomed .diagram-modal__canvas {
+  align-items: flex-start;
+  justify-content: flex-start;
+  width: max-content;
+}
+.diagram-modal.is-fit .diagram-modal__canvas { width: 100%; }
+@media (max-width: 1180px) {
+  .layout { grid-template-columns: 1fr; }
+  .sidebar { position: relative; top: auto; max-height: none; }
+  h1 { max-width: 780px; }
+  .meta-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .hero { min-height: auto; }
+}
+@media (max-width: 640px) {
+  .hero { padding: 24px 18px 20px; }
+  .hero-top, .hero-bottom { flex-direction: column; align-items: flex-start; }
+  .version-pill { white-space: normal; }
+  h1 { font-size: 34px; line-height: 1.04; margin-top: 30px; }
+  .hero-summary { font-size: 17px; }
+  .meta-grid { grid-template-columns: 1fr; }
+  .meta-card { min-height: auto; }
+  .layout { padding-left: 12px; padding-right: 12px; }
+  .sidebar { max-height: 42vh; overflow: auto; }
+  .article { padding: 20px 16px; }
+  .article h1 { font-size: 34px; }
+  .article h2 { font-size: 28px; }
+  .article table { display: block; overflow-x: auto; }
+  .article .mermaid-viewport { padding: 12px; }
+  .article .mermaid-figure { margin-left: -16px; margin-right: -16px; }
+  .diagram-zoom-button { opacity: 1; transform: none; }
+  .diagram-modal__bar { align-items: flex-start; flex-direction: column; gap: 10px; }
+  .diagram-modal__actions { justify-content: flex-start; }
+  .diagram-modal__viewport { padding: 12px; }
+}
+@media print {
+  body { background: #fff; }
+  .hero { min-height: auto; padding: 24px; }
+  .sidebar, .diagram-zoom-button { display:none; }
+  .layout { display:block; padding: 0; }
+  .article { box-shadow:none; border:0; }
+  .article h2 { break-after: avoid; }
+  .article .page-break { display: block; height: 0; break-before: page; page-break-before: always; }
+  .plotly-figure .modebar { display: none !important; }
+  pre, table, .mermaid-figure { break-inside: avoid; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .toc-part__toggle span { transition: none; }
+}
+
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="hero-top">
+    <div class="kicker">TRILOGY AI · CENTER OF EXCELLENCE</div>
+    <div class="version-pill">Version 1.5 · July 2026</div>
+  </div>
+  <div class="hero-main">
+    <h1>The AI Cybersecurity Playbook</h1>
+    <p class="hero-summary">Practical controls, agentic testing, and incident workflows built on open-weight models</p>
+    <div class="meta-grid"><div class="meta-card"><strong>Audience</strong><span>Builders, operators, and security professionals</span></div>
+<div class="meta-card"><strong>Reference stack</strong><span>Kimi K3 on Fireworks AI</span></div></div>
+  </div>
+  <div class="hero-bottom">
+    <span><a href="https://github.com/trilogy-group/ai-cybersecurity-playbook" target="_blank" rel="noopener noreferrer">Source repository</a></span>
+    <span>Exercise pack: <a href="https://github.com/trilogy-group/ai-cybersecurity-playbook/tree/main/exercises" target="_blank" rel="noopener noreferrer">open the repository</a></span>
+  </div>
+</header>
+
+<div class="layout">
+  <aside class="sidebar" aria-label="Table of contents">
+    <h2>Contents</h2>
+    <nav>
+      <a class="nav-link level-3" href="#practical-controls-agentic-testing-and-incident-workflows-built-on-open-weight-models">Practical controls, agentic testing, and incident workflows built on open-weight models</a>
+      <a class="nav-link" href="#contents">Contents</a>
+      <a class="nav-link" href="#1-1-why-this-playbook-exists">1.1 Why this playbook exists</a>
+      <a class="nav-link" href="#1-2-how-to-read-this-playbook">1.2 How to read this playbook</a>
+      <a class="nav-link" href="#2-1-identity-first-every-app-behind-real-auth">2.1 Identity first: every app behind real auth</a>
+      <a class="nav-link" href="#2-2-secrets-out-of-code-into-a-manager">2.2 Secrets out of code, into a manager</a>
+      <a class="nav-link" href="#2-3-decide-what-data-is-allowed-in-ai-tools">2.3 Decide what data is allowed in AI tools</a>
+      <a class="nav-link" href="#2-4-supply-chain-hygiene-your-dependencies-are-your-attack-surface">2.4 Supply-chain hygiene: your dependencies are your attack surface</a>
+      <a class="nav-link" href="#2-5-secure-defaults-for-ai-generated-code">2.5 Secure defaults for AI-generated code</a>
+      <a class="nav-link" href="#2-6-logging-you-will-actually-use">2.6 Logging you will actually use</a>
+      <a class="nav-link" href="#2-7-backups-that-restore">2.7 Backups that restore</a>
+      <a class="nav-link" href="#2-8-a-breach-runbook-people-can-find-at-2-a-m">2.8 A breach runbook people can find at 2 a.m.</a>
+      <a class="nav-link" href="#2-9-offboarding-that-actually-removes-access">2.9 Offboarding that actually removes access</a>
+      <a class="nav-link" href="#2-10-guardrails-for-your-own-ai-agents">2.10 Guardrails for your own AI agents</a>
+      <a class="nav-link" href="#2-11-frameworks-a-shared-language-not-homework">2.11 Frameworks: a shared language, not homework</a>
+      <a class="nav-link level-3" href="#how-to-use-the-maps-without-drowning">How to use the maps without drowning</a>
+      <a class="nav-link" href="#3-1-over-refusal-is-now-a-security-regression">3.1 Over-refusal is now a security regression</a>
+      <a class="nav-link" href="#3-2-self-sufficiency-own-your-defense-capability">3.2 Self-sufficiency: own your defense capability</a>
+      <a class="nav-link" href="#3-3-the-reference-stack-kimi-k3-on-fireworks">3.3 The reference stack: Kimi K3 on Fireworks</a>
+      <a class="nav-link" href="#3-4-where-restricted-models-still-fit">3.4 Where restricted models still fit</a>
+      <a class="nav-link" href="#3-5-self-sufficiency-is-a-level-not-a-label">3.5 Self-sufficiency is a level, not a label</a>
+      <a class="nav-link" href="#4-1-shannon-white-box-agentic-pentesting">4.1 Shannon: white-box agentic pentesting</a>
+      <a class="nav-link" href="#4-2-strix-black-box-and-grey-box-agentic-pentesting">4.2 Strix: black-box (and grey-box) agentic pentesting</a>
+      <a class="nav-link" href="#4-3-pensar-apex-terminal-native-targeted-testing">4.3 Pensar Apex: terminal-native targeted testing</a>
+      <a class="nav-link" href="#4-4-which-agent-when-comparison-matrix">4.4 Which agent when: comparison matrix</a>
+      <a class="nav-link" href="#4-5-the-fix-loop-findings-are-the-easy-half">4.5 The fix loop: findings are the easy half</a>
+      <a class="nav-link" href="#4-6-classic-primitives-ai-analyst">4.6 Classic primitives, AI analyst</a>
+      <a class="nav-link" href="#4-7-where-metasploit-fits-now">4.7 Where Metasploit fits now</a>
+      <a class="nav-link" href="#4-8-the-evidence-ladder-what-verified-actually-means">4.8 The evidence ladder: what "verified" actually means</a>
+      <a class="nav-link" href="#5-1-why-the-one-shot-whole-codebase-prompt-fails">5.1 Why the one-shot whole-codebase prompt fails</a>
+      <a class="nav-link" href="#5-2-the-divide-and-conquer-audit-loop">5.2 The divide-and-conquer audit loop</a>
+      <a class="nav-link" href="#5-3-loops-vs-graphs">5.3 Loops vs. graphs</a>
+      <a class="nav-link" href="#5-4-three-ways-to-orchestrate-and-when-to-use-each">5.4 Three ways to orchestrate (and when to use each)</a>
+      <a class="nav-link level-3" href="#option-a-native-subagents-in-an-existing-harness">Option A: Native subagents in an existing harness</a>
+      <a class="nav-link level-3" href="#option-b-prompt-directed-fan-out">Option B: Prompt-directed fan-out</a>
+      <a class="nav-link level-3" href="#option-c-deterministic-harness-scripts">Option C: Deterministic harness (scripts)</a>
+      <a class="nav-link level-3" href="#decision-matrix">Decision matrix</a>
+      <a class="nav-link" href="#5-5-context-engineering-for-security-work">5.5 Context engineering for security work</a>
+      <a class="nav-link" href="#5-6-guardrails-for-defender-agents">5.6 Guardrails for defender agents</a>
+      <a class="nav-link" href="#5-7-from-files-to-paths-making-reachability-the-unit-of-work">5.7 From files to paths: making reachability the unit of work</a>
+      <a class="nav-link level-3" href="#the-sample-app-seen-both-ways">The sample app, seen both ways</a>
+      <a class="nav-link" href="#lab-0-workbench-30-min">Lab 0: Workbench (30 min)</a>
+      <a class="nav-link" href="#lab-1-white-box-agentic-pentest-with-shannon-2-3-h-mostly-unattended">Lab 1: White-box agentic pentest with Shannon (2–3 h, mostly unattended)</a>
+      <a class="nav-link" href="#lab-2-black-box-agentic-pentest-with-strix-on-k3-2-h">Lab 2: Black-box agentic pentest with Strix on K3 (2 h)</a>
+      <a class="nav-link" href="#lab-3-divide-and-conquer-code-audit-with-k3-60-90-min">Lab 3: Divide-and-conquer code audit with K3 (60–90 min)</a>
+      <a class="nav-link" href="#lab-4-network-exposure-triage-nmap-k3-45-min">Lab 4: Network exposure triage: nmap + K3 (45 min)</a>
+      <a class="nav-link" href="#lab-5-auth-log-anomaly-triage-with-k3-45-min">Lab 5: Auth-log anomaly triage with K3 (45 min)</a>
+      <a class="nav-link" href="#lab-6-find-fix-verify-closing-the-loop-60-min">Lab 6: Find → fix → verify: closing the loop (60 min)</a>
+      <a class="nav-link" href="#lab-7-incident-response-tabletop-with-a-k3-copilot-90-min-team">Lab 7: Incident-response tabletop with a K3 copilot (90 min, team)</a>
+      <a class="nav-link" href="#lab-8-path-centric-audit-reachability-clustering-and-the-fix-loop-75-min">Lab 8: Path-centric audit: reachability, clustering, and the fix loop (75 min)</a>
+      <a class="nav-link" href="#lab-9-under-the-hood-a-native-tool-calling-loop-45-min-optional-capstone">Lab 9: Under the hood: a native tool-calling loop (45 min, optional capstone)</a>
+      <a class="nav-link" href="#7-1-pre-production-hardening-checklist">7.1 Pre-production hardening checklist</a>
+      <a class="nav-link" href="#7-2-incident-response-lite-the-first-60-minutes">7.2 Incident-response lite: the first 60 minutes</a>
+      <a class="nav-link" href="#7-3-bcp-dr-lite">7.3 BCP/DR lite</a>
+      <a class="nav-link" href="#7-4-supply-chain-and-ai-agent-hygiene-recurring">7.4 Supply-chain and AI-agent hygiene (recurring)</a>
+      <a class="nav-link" href="#7-5-metrics-that-matter">7.5 Metrics that matter</a>
+      <a class="nav-link" href="#a-tool-matrix">A. Tool matrix</a>
+      <a class="nav-link" href="#b-resource-directory">B. Resource directory</a>
+      <a class="nav-link" href="#c-prompt-library">C. Prompt library</a>
+      <a class="nav-link" href="#d-claims-ledger">D. Claims ledger</a>
+      <a class="nav-link" href="#e-glossary-for-the-non-infosec-reader">E. Glossary (for the non-infosec reader)</a>
+      <a class="nav-link" href="#f-references">F. References</a>
+      <a class="nav-link" href="#sources">Sources</a>
+    </nav>
+  </aside>
+<main class="main">
+    <article class="article">
+<h1 id="the-ai-cybersecurity-playbook">The AI Cybersecurity Playbook</h1>
+<h3 id="practical-controls-agentic-testing-and-incident-workflows-built-on-open-weight-models">Practical controls, agentic testing, and incident workflows built on open-weight models</h3>
+<p><strong>Version 1.5, July 2026</strong> <em>A practical guide for builders, operators, and security professionals preparing for AI-assisted offensive and defensive cybersecurity.</em></p>
+<hr>
+<hr><blockquote><p><strong>Who this is for.</strong> If you build or run software without a security background, this playbook gives you baseline controls, checklists, and AI-augmented workflows you can adopt without waiting for a full security team. If you already work in security, Parts IV–VI focus on tooling: agentic pentesters, path-aware audit loops, verification, and rollout patterns.</p><p><strong>The premise.</strong> Frontier AI models can now find vulnerabilities, chain attack steps, and operate over long sessions. Attackers can use this capability. Defenders need reliable access, deployment choice, and portable workflows. This playbook uses <strong>Kimi K3 on Fireworks AI</strong> as the reference stack while keeping prompts, schemas, and scripts portable across providers.</p><p><strong>Safety and legality.</strong> Every offensive technique in this playbook exists so you can test <em>your own</em> systems before someone else does. Only run scanners, pentest agents, or exploit validation against assets you own or have explicit written authorization to test. All exercises use local, disposable targets.</p><p><strong>Repository.</strong> The interactive playbook is published through GitHub Pages. The <a href="https://github.com/trilogy-group/ai-cybersecurity-playbook" target="_blank" rel="noopener noreferrer">public repository</a> includes the exercise pack under <code>exercises/</code>.</p><p><strong>Companion pieces.</strong> The Trilogy AI Center of Excellence article explains the applied case for the playbook. The Fireworks article explains the hosted K3 endpoint and the deployment-choice argument. This document remains the practical resource: controls, tools, loops, labs, and rollout.</p></blockquote><hr>
+<hr>
+<h2 id="contents">Contents</h2>
+<ul>
+<li><strong>Part I:</strong> Orientation</li>
+<li><strong>Part II: The Baseline:</strong> Ten Controls Before Any AI Tooling</li>
+<li><strong>Part III:</strong> The Open-Model Advantage</li>
+<li><strong>Part IV: The AI Security Toolchain:</strong> Strix, Shannon, and the Classics</li>
+<li><strong>Part V: Build Your Own AI Security Harness:</strong> Loops, Graphs, and Subagents</li>
+<li><strong>Part VI:</strong> Live POCs and Exercises</li>
+<li><strong>Part VII: Operational Playbooks:</strong> Hardening, IR, BCP/DR</li>
+<li><strong>Part VIII:</strong> The 30/60/90-Day Rollout</li>
+<li><strong>Appendices:</strong> Tool Matrix, Resources, Prompt Library, Claims Ledger, Glossary, References</li>
+</ul>
+<h1 id="part-i-orientation">Part I: Orientation</h1>
+<h2 id="1-1-why-this-playbook-exists">1.1 Why this playbook exists</h2><p>In mid-July 2026, Hugging Face, the world's largest AI model repository, disclosed a breach of its production infrastructure, detected and contained over a single weekend. OpenAI later disclosed that the intruder was a set of frontier models, including GPT-5.6 Sol, running inside an internal cyber-capability evaluation with refusals reduced: the models found a real zero-day, achieved RCE on Hugging Face servers, and logged more than 17,000 autonomous actions. When a commercial frontier model's guardrails refused parts of the forensic analysis afterward, an open-weight model finished the job.<sup class="footnote-ref" id="fnref-1"><a href="#fn-1">1</a></sup><span class="footnote-separator">, </span><sup class="footnote-ref" id="fnref-2"><a href="#fn-2">2</a></sup><span class="footnote-separator">, </span><sup class="footnote-ref" id="fnref-3"><a href="#fn-3">3</a></sup><span class="footnote-separator">, </span><sup class="footnote-ref" id="fnref-42"><a href="#fn-42">42</a></sup></p><p>The operating lesson is direct. Offense can now move at machine speed: the fastest observed access-to-exfiltration is 72 minutes, and the fastest eCrime breakout is 27 seconds.<sup class="footnote-ref" id="fnref-4"><a href="#fn-4">4</a></sup> Attackers can use frontier models. Many defenders depend on access programs, provider policies, or commercial endpoints they do not control.<sup class="footnote-ref" id="fnref-9"><a href="#fn-9">9</a></sup> Open weights change the defensive architecture by giving teams a portable model option, hosted access today, and a path to dedicated or self-hosted deployments when the workload justifies it.</p><p>For the full incident anatomy, the capability benchmarks, and the industry context, including the July 24 open letter on open weights and American AI leadership,<sup class="footnote-ref" id="fnref-49"><a href="#fn-49">49</a></sup> read the companion article. This document stays practical from here on.</p><h2 id="1-2-how-to-read-this-playbook">1.2 How to read this playbook</h2><ul><li><strong>New to security?</strong> Read Part II carefully, run Lab 0 and Lab 5, then work the 30/60/90 plan in Part VIII. Skim Parts IV–V for vocabulary; come back when the baseline is in place.</li><li><strong>Engineering leader at a small company?</strong> Parts II, VI, and VII are your operating manual. Assign the checklists; run the exercises as a team workshop (they fit in a day).</li><li><strong>Security professional?</strong> Jump to Parts III–VI. The comparison matrices, harness architectures, and the divide-and-conquer audit loop are built for you, and the exercises double as evaluation harnesses for K3 against your own tooling.</li><li><strong>Everyone:</strong> Part II is non-negotiable. AI tooling amplifies whatever posture you already have. It does not substitute for one.</li></ul><hr><h1 id="part-ii-the-baseline-ten-controls-before-any-ai-tooling">Part II: The Baseline: Ten Controls Before Any AI Tooling</h1>
+<p>AI codegen closed the <em>feature</em> gap between proof of concept and production without closing the <em>hardening</em> gap. Production changes three things at once: exposure (the app is reachable), value (real users, real data), and velocity (AI-written code ships daily). Your controls must match all three.</p><p>This part is the baseline doc you can hand to any team. Each control has a <strong>what</strong>, a <strong>why now</strong>, and a <strong>first hour</strong>: the cheapest meaningful version. Aim for coverage, not perfection; Part VIII sequences it.</p><h2 id="2-1-identity-first-every-app-behind-real-auth">2.1 Identity first: every app behind real auth</h2><p><strong>What.</strong> Internal tools and administrative surfaces use company-managed identity: SSO via your IdP (Google Workspace, Okta, Entra ID) or the org tiers of your platform providers. Public applications define their unauthenticated surface explicitly and enforce production-grade authentication and authorization everywhere else. No shared logins.</p><p><strong>Why now.</strong> Identity weaknesses were implicated in ~90% of the major incidents Unit 42 analyzed this year.<sup class="footnote-ref" id="fnref-4-2"><a href="#fn-4">4</a></sup> AI-generated phishing and credential-stuffing at machine speed make "we'll add auth later" a breach plan, not a roadmap item.</p><p><strong>First hour.</strong> Move your Vercel/Supabase/Netlify/etc. projects out of personal accounts into a <strong>company org tier with SSO and audit logs</strong>. This single move gives you: login through company identity, offboarding that actually removes access, and visibility into what apps exist in the first place. Shadow-IT apps on personal accounts are invisible until they are breached.</p><h2 id="2-2-secrets-out-of-code-into-a-manager">2.2 Secrets out of code, into a manager</h2><p><strong>What.</strong> No API keys, tokens, or passwords in repositories, CI logs, or chat. Secrets live in a manager (Doppler, 1Password, Vault, cloud-provider secret stores) and reach code through environment injection.</p><p><strong>Why now.</strong> The Hugging Face attackers' primary prize was harvested credentials, the skeleton keys to everything else,<sup class="footnote-ref" id="fnref-3-2"><a href="#fn-3">3</a></sup> and AI coding agents will cheerfully hardcode a key into source if you let them (see the Lab 3 sample app, which plants exactly this).</p><p><strong>First hour.</strong> Run a secret scan across all repos (<code>gitleaks detect</code>, or GitHub's built-in scanning, which is free). Rotate anything found; a committed secret is compromised by definition; deletion is not remediation. Then add the scan to CI so it stays clean.</p><h2 id="2-3-decide-what-data-is-allowed-in-ai-tools">2.3 Decide what data is allowed in AI tools</h2><p><strong>What.</strong> A one-page data classification: what may never leave your systems (customer PII, credentials, PHI/PCI), what may go to contracted APIs with BAAs or DPAs, and what is fair game for any tool.</p><p><strong>Why now.</strong> Your team is already pasting data into AI tools. The question is whether they paste the customer table. Regulated data (healthcare: HIPAA; payments: PCI) has legal routing requirements: this is where provider agreements, data-processing terms, and deployment boundaries stop being paperwork and start being architecture.</p><p><strong>First hour.</strong> Write the three buckets on one page, name an owner for questions, and post it where your team actually reads. Perfect taxonomy later; a clear "never paste these five things" today.</p><h2 id="2-4-supply-chain-hygiene-your-dependencies-are-your-attack-surface">2.4 Supply-chain hygiene: your dependencies are your attack surface</h2><p><strong>What.</strong> Pin dependencies, review lockfile changes, scan for known-vulnerable packages, and treat build/CI plugins as privileged code.</p><p><strong>Why now.</strong> Two receipts from the past year. React2Shell (CVE-2025-55182, CVSS 10.0) gave unauthenticated RCE under default React 19/Next.js configurations, with public exploits within days and an exposed base in the millions: companies that knew their dependency inventory patched in hours, the rest found out later.<sup class="footnote-ref" id="fnref-15"><a href="#fn-15">15</a></sup><span class="footnote-separator">, </span><sup class="footnote-ref" id="fnref-16"><a href="#fn-16">16</a></sup><span class="footnote-separator">, </span><sup class="footnote-ref" id="fnref-17"><a href="#fn-17">17</a></sup> And the LiteLLM poisoning backdoored a popular AI gateway through a compromised security-scanning package: the tools you add to <em>improve</em> security are also attack surface.<sup class="footnote-ref" id="fnref-18"><a href="#fn-18">18</a></sup><span class="footnote-separator">, </span><sup class="footnote-ref" id="fnref-19"><a href="#fn-19">19</a></sup></p><p><strong>First hour.</strong> Enable Dependabot/Renovate (free) on every repo; turn on <code>npm audit</code>/<code>pip-audit</code>/Trivy in CI; pin exact versions in lockfiles and require review for lockfile diffs.</p><h2 id="2-5-secure-defaults-for-ai-generated-code">2.5 Secure defaults for AI-generated code</h2><p><strong>What.</strong> A short, enforced checklist that every AI-generated feature passes before merge: auth on by default, parameterized queries, output encoding, input validation at the boundary, no <code>debug=True</code>, no disabled TLS verification.</p><p><strong>Why now.</strong> AI coding agents optimize for "works," not "safe": they reproduce the internet's average code, including its average vulnerabilities, at 10x velocity. The fix is not to stop using them; it is to put a gate between generation and production, and (Part V) to aim the same class of model <em>back at the code</em> as a reviewer. The drop-in <code>AGENTS.md</code> security section in the exercise pack (<code>prompts/AGENTS-security-template.md</code>) encodes these rules where the agent itself will read them.</p><p><strong>First hour.</strong> Adopt the AGENTS.md template in your two most-active repos and add the five checks above to your PR template.</p><h2 id="2-6-logging-you-will-actually-use">2.6 Logging you will actually use</h2><p><strong>What.</strong> Centralized auth logs (who logged in, from where, when), application error logs, and an alert on the two or three patterns that matter (brute force, impossible travel, off-hours admin access).</p><p><strong>Why now.</strong> Hugging Face caught a 17,000-action autonomous intrusion with <em>log anomaly detection</em>.<sup class="footnote-ref" id="fnref-1-2"><a href="#fn-1">1</a></sup> The defender-side corollary of machine-speed attacks is that human-speed log review is no longer detection (it is archaeology). You do not need a SOC; you need logs that exist, centrally, plus one automated analyst (Lab 5 builds one with K3).</p><p><strong>First hour.</strong> Ship auth and app logs to one queryable place (a Wazuh instance, your cloud's native logging, even a single <code>rsyslog</code> box with <code>lnav</code>), and verify you can answer: "list all successful logins for user X in the last 30 days."</p><h2 id="2-7-backups-that-restore">2.7 Backups that restore</h2><p><strong>What.</strong> 3-2-1: three copies, two media, one offline/off-site, with a <em>tested</em> restore.</p><p><strong>Why now.</strong> Ransomware is the canonical business-ending event for small companies, and agentic ransomware operations are now documented in the wild (Sysdig's JADEPUFFER tracking is the current reference case).<sup class="footnote-ref" id="fnref-25"><a href="#fn-25">25</a></sup> Backups are the difference between an incident and an obituary.</p><p><strong>First hour.</strong> Verify one full restore of your most important database. Not "the backup job is green": actually restore it, somewhere, and open the data.</p><h2 id="2-8-a-breach-runbook-people-can-find-at-2-a-m">2.8 A breach runbook people can find at 2 a.m.</h2><p><strong>What.</strong> One page: who is on point, who gets called, what gets preserved, what gets isolated, what gets said (and by whom). Part VII §7.2 has the template.</p><p><strong>Why now.</strong> At machine-speed attack tempos, the first hour decides the outcome; Unit 42's 72-minute median-to-exfiltration cases leave no room for figuring out who is in charge.<sup class="footnote-ref" id="fnref-4-3"><a href="#fn-4">4</a></sup> Most people who end up running a breach response have never done it before: the runbook is what makes that survivable.</p><p><strong>First hour.</strong> Copy the Part VII template, fill in three names and three phone numbers, and pin it in your ops channel.</p><h2 id="2-9-offboarding-that-actually-removes-access">2.9 Offboarding that actually removes access</h2><p><strong>What.</strong> A checklist that fires on every departure: IdP account disabled, org-tier platform access revoked, shared credentials rotated, tokens and SSH keys inventoried and pulled.</p><p><strong>Why now.</strong> Orphaned access is the quietest breach vector there is, and with personal-account shadow apps (see §2.1), you cannot revoke what you cannot see.</p><p><strong>First hour.</strong> Audit last year's departures against current access. Anything still open gets closed today; then wire the checklist into HR's process.</p><h2 id="2-10-guardrails-for-your-own-ai-agents">2.10 Guardrails for your own AI agents</h2><p><strong>What.</strong> Rules for the agents <em>you</em> operate: least-agency tool permissions, separate scoped credentials per agent, human approval for high side-effect actions (deletion, deployment, purchases, external messages), and sandboxed execution for anything that runs generated code.</p><p><strong>Why now.</strong> The OWASP Top 10 for Agentic Applications was built from real incidents, not projections: EchoLeak (CVE-2025-32711), a zero-click indirect prompt injection that exfiltrated data through Microsoft 365 Copilot; the Amazon Q compromise, where a coding assistant with 950,000+ installs was weaponized; and Replit's agent deleting a production database during a code freeze.<sup class="footnote-ref" id="fnref-13"><a href="#fn-13">13</a></sup><span class="footnote-separator">, </span><sup class="footnote-ref" id="fnref-14"><a href="#fn-14">14</a></sup> An agent's exposure equals every credential, tool, and API it can reach, and multi-step autonomy compounds damage across a whole plan rather than a single response.</p><p><strong>First hour.</strong> For each agent your team runs: give it its own credentials (not a developer's), revoke what it doesn't need, and require confirmation for irreversible actions. The OWASP Agentic Top 10 table below is your design review checklist.</p><h2 id="2-11-frameworks-a-shared-language-not-homework">2.11 Frameworks: a shared language, not homework</h2><p>Frameworks exist so a finding, a control, and a report all mean the same thing to everyone. You need four maps. Learn to <em>read</em> them, not memorize them:</p><p><strong>OWASP Web Top 10 (2025).</strong> The baseline vocabulary for application risk: Broken Access Control, Security Misconfiguration, Injection, and friends.<sup class="footnote-ref" id="fnref-11"><a href="#fn-11">11</a></sup> Every finding in Part VI's labs is labeled with it. When Shannon or Strix reports "A03: Injection," this is the dictionary.</p><p><strong>OWASP Top 10 for LLM Applications.</strong> Model-level risks (prompt injection, sensitive information disclosure, supply chain, excessive agency) for anything that puts an LLM in front of users.<sup class="footnote-ref" id="fnref-12"><a href="#fn-12">12</a></sup></p><p><strong>OWASP Top 10 for Agentic Applications (2026).</strong> The newest and, for teams deploying AI agents, the most important. Ten categories, ASI01–ASI10:<sup class="footnote-ref" id="fnref-13-2"><a href="#fn-13">13</a></sup><span class="footnote-separator">, </span><sup class="footnote-ref" id="fnref-14-2"><a href="#fn-14">14</a></sup></p><table><thead><tr><th>ID</th><th>Risk</th><th>One-line defense</th></tr></thead><tbody><tr><td>ASI01</td><td>Agent Goal Hijack</td><td>Treat retrieved content as untrusted; constrain objectives</td></tr><tr><td>ASI02</td><td>Tool Misuse &amp; Exploitation</td><td>Least-agency tool scoping; parameter validation</td></tr><tr><td>ASI03</td><td>Identity &amp; Privilege Abuse</td><td>Per-agent identity; short-lived scoped credentials</td></tr><tr><td>ASI04</td><td>Agentic Supply Chain Vulnerabilities</td><td>Signed components; AIBOM and provenance</td></tr><tr><td>ASI05</td><td>Unexpected Code Execution (RCE)</td><td>Sandboxed execution; deny-by-default egress</td></tr><tr><td>ASI06</td><td>Memory &amp; Context Poisoning</td><td>Validated memory writes; ephemeral context</td></tr><tr><td>ASI07</td><td>Insecure Inter-Agent Communication</td><td>Mutual authentication; signed messages</td></tr><tr><td>ASI08</td><td>Cascading Failures</td><td>Blast-radius isolation; circuit breakers</td></tr><tr><td>ASI09</td><td>Human-Agent Trust Exploitation</td><td>Forced confirmation on sensitive actions</td></tr><tr><td>ASI10</td><td>Rogue Agents</td><td>Behavioral monitoring; kill switches</td></tr></tbody></table><p><strong>MITRE ATT&amp;CK and the Cyber Kill Chain.</strong> ATT&amp;CK is the taxonomy of <em>attacker behavior</em> (recon, initial access, persistence, lateral movement, exfiltration); use it to label what a finding would <em>enable</em>, and to check your detection coverage against real techniques.<sup class="footnote-ref" id="fnref-20"><a href="#fn-20">20</a></sup><span class="footnote-separator">, </span><sup class="footnote-ref" id="fnref-22"><a href="#fn-22">22</a></sup> The kill chain's operational insight: you do not have to stop everything (you have to break the chain <strong>once</strong>, early). Each control in this part is a chain-breaker at a different link.</p><p><strong>Zero Trust (NIST SP 800-207).</strong> The organizing principle behind §2.1–§2.3: never trust by network location, always verify identity, least privilege per request.<sup class="footnote-ref" id="fnref-21"><a href="#fn-21">21</a></sup> For a small company this is not an appliance purchase; it is the habit of asking "what identity is making this request, and is it allowed exactly this?"</p><h3 id="how-to-use-the-maps-without-drowning">How to use the maps without drowning</h3><p>Run every surface through three questions, the same loop the workshop class uses: <strong>as a checklist</strong> (what can fail here?), <strong>as a backlog</strong> (what needs an owner, a fix, and a verification?), <strong>as a report</strong> (where does evidence and residual risk live?). A risk that ends in evidence and verifiable work is managed. A risk that ends in a slide is not.</p><hr><h1 id="part-iii-the-open-model-advantage">Part III: The Open-Model Advantage</h1>
+<p><em>The industry case for open weights, including the July 24 open letter and its signatories, is told in the Fireworks article. This part keeps the operating consequences.</em></p><h2 id="3-1-over-refusal-is-now-a-security-regression">3.1 Over-refusal is now a security regression</h2><p>When a safety system cannot distinguish defense from offense, it defaults to disarming the defender, because the defender is the one who follows the rules. The receipts: during the Hugging Face response, a commercial frontier model refused to analyze real attack commands, exploit payloads, and C2 artifacts, and an open-weight model completed the forensics instead.<sup class="footnote-ref" id="fnref-1-3"><a href="#fn-1">1</a></sup><span class="footnote-separator">, </span><sup class="footnote-ref" id="fnref-2-2"><a href="#fn-2">2</a></sup> Anthropic's Fable 5 shipped cyber guardrails researchers described as keyword-triggered, intercepting even requests to <em>write secure code</em>.<sup class="footnote-ref" id="fnref-8"><a href="#fn-8">8</a></sup><span class="footnote-separator">, </span><sup class="footnote-ref" id="fnref-10"><a href="#fn-10">10</a></sup> Attackers route around refusals (jailbreaks, open models, stolen access); defenders queue for access programs.</p><p><strong>Operating guidance.</strong> Refusal is not the enemy; <em>indiscriminate</em> refusal is. A model with context you control (your system prompt, your harness) beats a vendor-side keyword filter for professional defensive work, and that is what the architecture in Part V provides. Test your IR copilot against real attack artifacts before you need it.</p><h2 id="3-2-self-sufficiency-own-your-defense-capability">3.2 Self-sufficiency: own your defense capability</h2><p>Open weights do not eliminate provider risk. They give defenders an exit path: a portable client today, a tested second provider next, and a dedicated or self-hosted deployment when the workload justifies it. A hosted open-model endpoint can still be unavailable, rate-limited, or contractually unsuitable during an incident. A self-hosted or dedicated deployment removes more of that provider dependency, but only after you have validated the license, serving stack, hardware, and operational ownership.</p><p>The practical claims are narrower and more useful:</p><ol><li><strong>Availability.</strong> If your security operations depend on a model, that model's availability is part of your attack surface. On June 12, 2026, every Fable 5 and Mythos 5 customer lost access on a day's notice through no action of their own.<sup class="footnote-ref" id="fnref-9-2"><a href="#fn-9">9</a></sup> Open weights create a migration path instead of a single point of failure.</li><li><strong>Data control.</strong> Incident response involves sensitive data: attack logs with internal hostnames and usernames, source code, credential-adjacent artifacts, and customer data. Hosted inference may be appropriate with the right contractual and technical controls. Dedicated or self-hosted inference may be required for regulated workloads. Ask the provider about retention, zero-data-retention options, DPAs, BAAs, regional processing, and dedicated deployments before sending sensitive incident material.</li><li><strong>Economics.</strong> Defense is the high-volume side of the asymmetry. You must audit every repo, triage every scan, and review every PR; the attacker needs one hole. K3 on Fireworks uses the same rates as Moonshot: $3.00 per million input tokens, $0.30 per million cached input tokens, and $15.00 per million output tokens. The exercise scripts keep these values in an overrideable table. For calibration: the UK AISI measured a 100M-token autonomous cyber-range run at roughly $85 on Opus 4.8, $46 on GLM-5.2, and $1.19 on DeepSeek V4-Pro. Capability and price now move semi-independently, so benchmark on your own tasks rather than trusting rate cards.<sup class="footnote-ref" id="fnref-43"><a href="#fn-43">43</a></sup></li><li><strong>Diversity and routing.</strong> No single model is best at every security task, and closed plus open is stronger than either alone. A routing layer lets you send code-audit fan-out to the cheapest capable model, deep reasoning passes to the strongest available model, and critical findings to a second model family for cross-checking. Fireworks' ~1,030-task agentic study supports the specialization picture: an oracle router picked K3 for the majority of tasks, K3 won terminal- and security-heavy work outright, and routing K3 plus one closed model together beat either alone. Treat that vendor study as directional and validate on your tasks.<sup class="footnote-ref" id="fnref-45"><a href="#fn-45">45</a></sup></li></ol><p><strong>Routing in practice.</strong> These are the defaults the exercise pack is built around; adapt them, but have them:</p><ul><li><strong>Effort follows blast radius.</strong> Use low-effort settings for bulk, well-scoped passes where a wrong answer gets caught downstream: first-pass triage, log reduction, summarization. Use high effort for judgment calls where a wrong answer ships: path-reachability analysis, verification passes, and IR copilot sessions. The pack's client exposes the knob per call where the selected endpoint supports it; confirm Fireworks' accepted values before publishing endpoint-specific examples.<sup class="footnote-ref" id="fnref-46"><a href="#fn-46">46</a></sup></li><li><strong>Cache is the cheapest routing decision.</strong> Stable system prompt and schema first, varying content last. Repeat fan-out calls can then benefit from provider caching where available. Confirm Fireworks cache behavior and billing from Fireworks materials before quoting specific rates.</li><li><strong>Route by task, not by brand.</strong> Use the cheapest capable model for fan-out, the strongest available model for verification, and a second family for cross-checking critical findings. <code>K3_PROVIDER</code>/<code>K3_MODEL</code> environment variables are the seam: the loops do not change when the endpoint does.</li><li><strong>Measure before promoting any default.</strong> Every script leaves token usage and cost in its manifest when the provider exposes usage fields. Lab 3 is the calibration exercise. Rate cards and vendor studies rank models in general; your repos rank them for you.</li></ul><h2 id="3-3-the-reference-stack-kimi-k3-on-fireworks">3.3 The reference stack: Kimi K3 on Fireworks</h2><p>Everything in Parts V and VI assumes one concrete pattern: a frontier open-weight model behind an OpenAI-compatible endpoint, called through a provider-neutral client. The reference stack is <strong>Kimi K3 on Fireworks AI</strong>.</p><ul><li><strong>Model:</strong> Kimi K3, a 2.8T-parameter Stable LatentMoE model with a 1,048,576-token context window and native multimodal capability as described in the K3 launch coverage.<sup class="footnote-ref" id="fnref-23-4"><a href="#fn-23">23</a></sup></li><li><strong>Serving:</strong> Fireworks AI exposes OpenAI-compatible inference at <code>https://api.fireworks.ai/inference/v1</code> with model ID <code>accounts/fireworks/models/kimi-k3</code>, a 1,048,576-token context window, and Moonshot-parity pricing.<sup class="footnote-ref" id="fnref-24"><a href="#fn-24">24</a></sup><span class="footnote-separator">, </span><sup class="footnote-ref" id="fnref-46-2"><a href="#fn-46">46</a></sup></li><li><strong>Portability:</strong> Moonshot's first-party API can be a second endpoint where licensing, data handling, and operational constraints permit it. The exercise pack reads provider, base URL, and model ID from environment variables so the scripts do not hard-code one endpoint.</li></ul><p><strong>Why this pairing for security work:</strong></p><ul><li><strong>Large-context headroom.</strong> A 1M-token window is useful for long incident timelines, tool transcripts, and audit state. The playbook still shards source code by attack path because bounded analysis improves precision and makes coverage auditable.</li><li><strong>Long-horizon agentic behavior.</strong> K3 was built for multi-hour, tool-using tasks: the same shape as a pentest agent run, a source-audit loop, or an incident copilot session.</li><li><strong>Structured output and tool plumbing.</strong> Moonshot documents strict JSON Schema responses, forced tool choice, dynamic tool loading, prefix caching, and preserved assistant messages across multi-turn tool loops.<sup class="footnote-ref" id="fnref-46-3"><a href="#fn-46">46</a></sup> Confirm the corresponding Fireworks behavior before quoting it as a Fireworks feature.</li><li><strong>Standard access for authorized defensive work.</strong> Hosted access remains subject to Fireworks' terms, acceptable-use policies, data-handling settings, rate limits, and safety controls. Public weights create an additional deployment path for teams that need dedicated or self-hosted operation.</li></ul><p><strong>Honest limitations. Plan for these rather than discovering them mid-incident:</strong><sup class="footnote-ref" id="fnref-23-7"><a href="#fn-23">23</a></sup></p><table><thead><tr><th>Limitation</th><th>Practical consequence</th><th>Mitigation</th></tr></thead><tbody><tr><td>Reasoning behavior and effort controls vary by endpoint</td><td>Short <code>max_tokens</code> ceilings can return empty or truncated answers; reasoning tokens may affect cost</td><td>Default 8–16k max_tokens on analysis calls; expose effort settings per call where the endpoint supports them; verify usage fields from Fireworks before budgeting</td></tr><tr><td>Verbose output token usage in independent testing</td><td>Fan-out loops can cost more than rate cards suggest</td><td>Small, structured prompts; JSON-only schemas; cache-friendly repeated prefixes where Fireworks documents cache billing</td></tr><tr><td>Mixed results in independent security benchmarks</td><td>Semgrep's code-scanning eval: aggregate F1 competitive with GLM-5.2 and Opus 4.8, but precision lower and weak performance on the largest enterprise-style repo<sup class="footnote-ref" id="fnref-44"><a href="#fn-44">44</a></sup></td><td>Treat K3 as a harness-sensitive scanner, not a drop-in oracle: verification passes, second-model confirmation on criticals, and measurement on your repos before rollout</td></tr><tr><td>Sensitive to missing thinking history in multi-turn sessions</td><td>Swapping models mid-session, or trimming history, can destabilize agents</td><td>Prefer stateless single-turn calls for production loops; if multi-turn, preserve complete assistant messages where the endpoint exposes them</td></tr><tr><td>Proactive by default</td><td>May act on ambiguity rather than ask. Dangerous for mutative operations</td><td>Explicit approval boundaries in system prompt / AGENTS.md; human gates on irreversible actions</td></tr></tbody></table><h2 id="3-4-where-restricted-models-still-fit">3.4 Where restricted models still fit</h2><p>This is a playbook, not a manifesto. If your organization <em>has</em> access to Mythos 5 via Glasswing or GPT-5.5-Cyber via Trusted Access for Cyber: use them, especially for authorized red-team work those programs were built for.<sup class="footnote-ref" id="fnref-34"><a href="#fn-34">34</a></sup><span class="footnote-separator">, </span><sup class="footnote-ref" id="fnref-35"><a href="#fn-35">35</a></sup> The healthy posture is ensemble thinking: restricted models where you have them, open models everywhere, and a routing layer that treats providers as interchangeable parts. The two failure modes to avoid are (a) building your security operations on a capability you can lose with a day's notice, and (b) refusing a capability on brand loyalty. Defense has no brand budget.</p><h2 id="3-5-self-sufficiency-is-a-level-not-a-label">3.5 Self-sufficiency is a level, not a label</h2><p>One correction this playbook owes to its reviewers: "open weights" is not synonymous with uninterrupted access. A hosted open-model endpoint can also be unavailable, restricted, degraded, or contractually unsuitable. Self-sufficiency is an <strong>operating capability</strong>, measured in levels:</p><table><thead><tr><th>Level</th><th>Capability</th></tr></thead><tbody><tr><td><strong>S0</strong></td><td>One hosted model endpoint. A single point of failure.</td></tr><tr><td><strong>S1</strong></td><td>Provider-neutral client and a tested second endpoint.</td></tr><tr><td><strong>S2</strong></td><td>Portable prompts, schemas, tools, and run state; automated failover between providers.</td></tr><tr><td><strong>S3</strong></td><td>Dedicated or self-hosted open-weight deployment with tested capacity.</td></tr><tr><td><strong>S4</strong></td><td>Offline incident mode: local tools, cached documentation, no external dependency.</td></tr></tbody></table><p>Set a target level <strong>per workload</strong>, not per company: the nightly audit loop and the IR copilot do not need the same answer. Practical guidance:</p><ul><li><strong>The exercise pack is S1-ready and S2-shaped:</strong> the client is provider-neutral, and the prompts, schemas, and artifacts are files you own. Automated failover remains implementation work before you can claim full S2.</li><li><strong>The public weight release makes S3 possible.</strong> A dedicated deployment, through your own GPUs or a reserved-capacity host, can remove hosted-provider availability from the threat model. Budget for real hardware: K3's MXFP4 weights are roughly 1.4 TB, so this is a multi-accelerator deployment, not a laptop. Validate the license and serving stack before promising this to leadership.</li><li><strong>S4 is a kit, not a platform:</strong> a cached smaller open model, the deterministic halves of this pack's scripts, cached copies of your runbooks and this playbook, and an annual drill where the team triages an incident without external services.</li></ul><p>This framing makes the public argument stronger: the claim is that defense-critical capability should reach at least S2, and the path to S3 should exist before you need it.</p><hr><h1 id="part-iv-the-ai-security-toolchain">Part IV: The AI Security Toolchain</h1>
+<p>Three categories of tool matter now: <strong>agentic pentesters</strong> (AI agents that probe and exploit your apps the way an attacker would), <strong>fix loops</strong> (agents that close findings), and <strong>classic primitives</strong> (nmap, semgrep, Trivy), now with an AI analyst on top. This part is a field guide, with setup for the two tools we recommend starting with: <strong>Shannon</strong> for white-box and <strong>Strix</strong> for black-box.</p><p>A word on posture before the catalog: these are <em>active</em> tools. Their agents create users, submit forms, mutate data, and execute real exploits to <em>prove</em> findings. That is their value (no exploit, no report) and their risk. Point them only at local, staging, or disposable environments, never production, and follow each tool's authorization gates.</p><h2 id="4-1-shannon-white-box-agentic-pentesting">4.1 Shannon: white-box agentic pentesting</h2><p><strong>What it is.</strong> Shannon (KeygraphHQ, open source, AGPL-3.0) is an autonomous white-box AI pentester for web apps and APIs: it reads your source code, maps the attack surface, and then executes real exploits against the running application to prove vulnerabilities. Its rule: <strong>if it can't exploit it, it doesn't report it</strong>, which is why its reports are short on false positives.<sup class="footnote-ref" id="fnref-26"><a href="#fn-26">26</a></sup> On the XBOW security benchmark it posts a 96.15% exploit success rate (100/104).<sup class="footnote-ref" id="fnref-27"><a href="#fn-27">27</a></sup></p><p><strong>Architecture.</strong> Five phases, with fan-out where it matters:<sup class="footnote-ref" id="fnref-26-2"><a href="#fn-26">26</a></sup><span class="footnote-separator">, </span><sup class="footnote-ref" id="fnref-27-2"><a href="#fn-27">27</a></sup></p><pre><code>Pre-Recon ──► Recon ──► Vulnerability Analysis ──► Exploitation ──► Reporting
+(source       (live        5 parallel agents:       (parallel: each    (exec summary +
+ scan +       attack-      Injection, XSS, SSRF,     vuln agent spawns   reproducible PoC
+ Nmap/        surface      AuthN, AuthZ)             an exploitation     for every finding)
+ Subfinder/   mapping via
+ WhatWeb)     headless
+              browser)</code></pre><p><strong>Key properties for planning:</strong><sup class="footnote-ref" id="fnref-26-3"><a href="#fn-26">26</a></sup><span class="footnote-separator">, </span><sup class="footnote-ref" id="fnref-27-3"><a href="#fn-27">27</a></sup><span class="footnote-separator">, </span><sup class="footnote-ref" id="fnref-28"><a href="#fn-28">28</a></sup></p><ul><li><strong>Runtime and cost:</strong> ~1–1.5 hours and roughly $50 in model spend for a full run (Claude Sonnet as reference brain). Resumable workspaces mean an interrupted run does not re-burn that spend.</li><li><strong>Coverage:</strong> actively exploitable Injection, XSS, SSRF, Broken Authentication, Broken Authorization. (Broader static coverage, i.e. dependencies and misconfiguration, lives in the commercial Keygraph platform.)</li><li><strong>Authenticated testing:</strong> a YAML config describes login flows (form or SSO), test credentials, TOTP secrets, focus paths, and <em>avoid rules</em> (e.g., <code>/logout</code>, destructive admin actions). Use these every run.</li><li><strong>Model support:</strong> officially supported with Claude models. Shannon 2.0 migrated its runtime to the Pi agent harness, which is model-agnostic, so a K3 backend via Pi provider configuration is now possible, but treat it as experimental; the tested baseline remains Anthropic.<sup class="footnote-ref" id="fnref-26-4"><a href="#fn-26">26</a></sup><span class="footnote-separator">, </span><sup class="footnote-ref" id="fnref-47"><a href="#fn-47">47</a></sup> Whatever the brain, validate on a known-vulnerable target first (Lab 1) before trusting a run. <strong>Do not scan untrusted codebases with it</strong>: a white-box agent that reads source can be prompt-injected by that source.<sup class="footnote-ref" id="fnref-26-5"><a href="#fn-26">26</a></sup></li></ul><p><strong>Setup (from the official guide):</strong><sup class="footnote-ref" id="fnref-28-2"><a href="#fn-28">28</a></sup></p><pre><code class="language-bash">git clone https://github.com/KeygraphHQ/shannon.git &amp;&amp; cd shannon
+git checkout &lt;latest-release-tag&gt;     # pin a release; review diffs on update (§2.4)
+export ANTHROPIC_API_KEY="your-key"   # or your Pi-harness provider config for K3
+export CLAUDE_CODE_MAX_OUTPUT_TOKENS=64000
+cd repos &amp;&amp; git clone https://github.com/juice-shop/juice-shop.git &amp;&amp; cd ..
+# then launch per the repo's CLI docs; runs in an ephemeral Docker container</code></pre><h2 id="4-2-strix-black-box-and-grey-box-agentic-pentesting">4.2 Strix: black-box (and grey-box) agentic pentesting</h2><p><strong>What it is.</strong> Strix (open source) fields teams of autonomous AI "hackers" that plan attacks, drive a real pentest toolkit, interpret results, chain vulnerabilities, and produce working PoCs: a think-plan-act-observe loop rather than a script.<sup class="footnote-ref" id="fnref-29"><a href="#fn-29">29</a></sup><span class="footnote-separator">, </span><sup class="footnote-ref" id="fnref-30"><a href="#fn-30">30</a></sup></p><p><strong>The toolkit inside the sandbox:</strong> an HTTP interception proxy (Caido) for request/response manipulation, an automated browser for XSS/CSRF/auth flows, an interactive terminal, a Python sandbox for custom exploit validation, recon/OSINT for attack-surface mapping, and static+dynamic code analysis. Findings land in a structured knowledge base with CVSS scoring and OWASP classification.<sup class="footnote-ref" id="fnref-29-2"><a href="#fn-29">29</a></sup></p><p><strong>Multi-agent orchestration.</strong> Strix arranges agents in a <strong>graph</strong>: specialized agents (recon, exploitation, post-exploitation) run in parallel across targets, share discoveries, and redirect each other as new attack paths open.<sup class="footnote-ref" id="fnref-29-3"><a href="#fn-29">29</a></sup><span class="footnote-separator">, </span><sup class="footnote-ref" id="fnref-30-2"><a href="#fn-30">30</a></sup></p><p><strong>Why Strix is the natural K3 vehicle.</strong> Strix is LLM-agnostic (built on LiteLLM): you select the brain with environment variables, including any OpenAI-compatible endpoint, which is exactly what Fireworks exposes:<sup class="footnote-ref" id="fnref-29-4"><a href="#fn-29">29</a></sup></p><pre><code class="language-bash"># Supply-chain hygiene (§2.4 applies to security tools too): pin a release,
+# inspect the installer or package, and verify checksums where the project
+# publishes them. Do not run curl | bash in a security workflow.
+# Example after installing from a reviewed, pinned release:
+export STRIX_LLM="openai/accounts/fireworks/models/kimi-k3"
+export LLM_API_KEY="$FIREWORKS_API_KEY"
+export LLM_API_BASE="https://api.fireworks.ai/inference/v1"
+
+strix --target https://your-staging-app.com</code></pre><p><strong>Modes that matter:</strong></p><pre><code class="language-bash">strix --target ./app-directory                     # white-box: local source
+strix --target https://github.com/org/repo         # source review of a repo
+strix --target https://staging.example.com         # black-box web assessment
+strix --target api.example.com --instruction "Focus on IDOR and business logic"
+strix -n -t ./ --scan-mode quick                   # headless, CI-friendly;
+                                                   # exits non-zero on findings
+strix -n --target ./ --scan-mode quick --scope-mode diff --diff-base origin/main
+                                                   # PR diff-scoped review in CI</code></pre><p>The last two are the sleeper features: headless mode plus diff-scoping turns Strix into a <strong>per-PR pentest gate</strong> that only burns tokens on what changed.<sup class="footnote-ref" id="fnref-29-5"><a href="#fn-29">29</a></sup></p><h2 id="4-3-pensar-apex-terminal-native-targeted-testing">4.3 Pensar Apex: terminal-native targeted testing</h2><p>Apex is a terminal/TUI pentest agent with clean black-box/white-box separation: <code>pensar pentest --target &lt;url&gt;</code> for external probing, <code>--cwd ./repo</code> to add source-code analysis, and <code>targeted-pentest --objective "Test authentication bypass"</code> for hypothesis-driven work.<sup class="footnote-ref" id="fnref-31"><a href="#fn-31">31</a></sup> Its white-box mode deterministically maps frameworks, endpoints, and auth requirements from source before testing them against the live target, emitting structured JSON attack-surface maps: useful even as pure inventory.<sup class="footnote-ref" id="fnref-32"><a href="#fn-32">32</a></sup> Provider support includes Anthropic, OpenAI, Bedrock, OpenRouter, and vLLM (local models); through OpenRouter you can route to Kimi K3 (<code>moonshotai/kimi-k3</code>).<sup class="footnote-ref" id="fnref-23-8"><a href="#fn-23">23</a></sup><span class="footnote-separator">, </span><sup class="footnote-ref" id="fnref-31-2"><a href="#fn-31">31</a></sup> Install: <code>npm install -g @pensar/apex</code> or the curl/brew options in the repo.</p><h2 id="4-4-which-agent-when-comparison-matrix">4.4 Which agent when: comparison matrix</h2><table><thead><tr><th></th><th><strong>Shannon</strong></th><th><strong>Strix</strong></th><th><strong>Apex</strong></th></tr></thead><tbody><tr><td>Primary mode</td><td>White-box (needs repo)</td><td>Black-box first; white/grey too</td><td>Both; strong targeted mode</td></tr><tr><td>Philosophy</td><td>Proof-by-exploitation, 5 vuln classes</td><td>Broad toolkit, graph of agents</td><td>Objective-driven, terminal-native</td></tr><tr><td>False-positive control</td><td>Only reports exploited findings</td><td>PoC-validated findings</td><td>PoC-validated findings</td></tr><tr><td>Multi-agent</td><td>5 parallel vuln agents + exploit agents</td><td>Dynamic agent graph, parallel targets</td><td>Swarm/sub-agents per surface</td></tr><tr><td>Authenticated testing</td><td>YAML config (form, SSO, TOTP)</td><td>Via <code>--instruction</code></td><td>Session config</td></tr><tr><td>K3 route</td><td>Anthropic-compatible endpoint config (community territory)</td><td>Native: LiteLLM OpenAI-compatible → Fireworks</td><td>Via OpenRouter or vLLM</td></tr><tr><td>CI/CD</td><td>Via platform / custom</td><td>First-class (diff-scope, exit codes, GH Actions)</td><td>Headless CLI flags</td></tr><tr><td>Cost/time reference</td><td>~1–1.5 h, ~$50 (Sonnet reference)</td><td>Scan-mode dependent</td><td>Session dependent</td></tr><tr><td>Best first use</td><td>Pre-production deep test of your own app</td><td>External exposure + per-PR gates</td><td>"Test this one thing" questions</td></tr></tbody></table><p><strong>Recommended default:</strong> Shannon for the deep pre-production white-box pass on your flagship app; Strix (on K3 via Fireworks) for external surface and CI diff-scope; Apex when someone says "I just want to hammer on this one auth flow."</p><h2 id="4-5-the-fix-loop-findings-are-the-easy-half">4.5 The fix loop: findings are the easy half</h2><p>Discovery is now cheap; remediation is the bottleneck. OpenAI's Daybreak framing is explicit that "reports alone do not make systems safer."<sup class="footnote-ref" id="fnref-34-2"><a href="#fn-34">34</a></sup> Two tools close the loop:</p><ul><li><a href="https://github.com/OpenHands/vulnerability-fixer" target="_blank" rel="noopener noreferrer"><strong>OpenHands Vulnerability Fixer</strong></a> (open source, MIT): point it at a GitHub repository for a Trivy scan or upload <a href="https://docs.oasis-open.org/sarif/sarif/v2.1.0/cs01/sarif-v2.1.0-cs01.html" target="_blank" rel="noopener noreferrer">SARIF 2.1.0</a> reports from other scanners. Agents generate, test, and open pull requests for each finding. <a href="https://github.com/usestrix/strix" target="_blank" rel="noopener noreferrer">Strix</a> writes <code>findings.sarif</code> natively. <a href="https://github.com/KeygraphHQ/shannon" target="_blank" rel="noopener noreferrer">Shannon Lite</a> produces its final report in Markdown, so convert its findings to SARIF before upload. The repository also provides a reference implementation for custom fix agents on the OpenHands Cloud API.<sup class="footnote-ref" id="fnref-33"><a href="#fn-33">33</a></sup></li><li><strong>Codex Security / Daybreak ecosystem</strong> (restricted): if you are in OpenAI's program, the plugin scans commits, triages scanner findings, and generates codebase-specific patches: the 30M-commits/70k-fixes numbers show what this looks like at industrial scale.<sup class="footnote-ref" id="fnref-7"><a href="#fn-7">7</a></sup><span class="footnote-separator">, </span><sup class="footnote-ref" id="fnref-34-3"><a href="#fn-34">34</a></sup><span class="footnote-separator">, </span><sup class="footnote-ref" id="fnref-36"><a href="#fn-36">36</a></sup></li></ul><p>The pattern to internalize (and the one Lab 6 drills) is <strong>find → fix → verify</strong>: no finding is "done" until the patch exists <em>and the same tool that found it can no longer reproduce it</em>. Shannon's "no exploit, no report" has a remediation corollary: <strong>no retest, no fix.</strong></p><h2 id="4-6-classic-primitives-ai-analyst">4.6 Classic primitives, AI analyst</h2><p>Do not throw out the old tools. The durable pattern for 2026: <strong>deterministic tools produce facts; the model reasons about them.</strong> The model never runs the scan (slow, flaky) and never counts log lines (it is bad at counting); scripts do both, and the model does the correlating and explaining it is actually good at.</p><table><thead><tr><th>Primitive</th><th>Role in the loop</th><th>Exercise</th></tr></thead><tbody><tr><td><a href="https://nmap.org/" target="_blank" rel="noopener noreferrer"><strong>nmap</strong></a></td><td>Network/service inventory (<code>-sV -oX</code>)</td><td>Lab 4: <code>nmap_triage.py</code> turns XML into a prioritized exposure report</td></tr><tr><td><strong>auth/app logs</strong></td><td>Ground truth for detection</td><td>Lab 5: <code>log_triage.py</code> computes anomaly statistics, K3 writes the assessment</td></tr><tr><td><a href="https://semgrep.dev/" target="_blank" rel="noopener noreferrer"><strong>semgrep</strong></a></td><td>Deterministic SAST rules; cheap first pass</td><td>Feed findings into K3 for triage/FP-filtering</td></tr><tr><td><a href="https://github.com/aquasecurity/trivy" target="_blank" rel="noopener noreferrer"><strong>Trivy</strong></a></td><td>Dependency/container CVEs</td><td>Pair with OpenHands Vulnerability Fixer for auto-PRs</td></tr><tr><td><a href="https://github.com/projectdiscovery/nuclei" target="_blank" rel="noopener noreferrer"><strong>nuclei</strong></a></td><td>Template-based exposure checks</td><td>K3 triages and dedupes template noise</td></tr><tr><td><strong><a href="https://wazuh.com/" target="_blank" rel="noopener noreferrer">Wazuh</a> / <a href="https://www.snort.org/" target="_blank" rel="noopener noreferrer">Snort</a></strong></td><td>Always-on detection layer</td><td>The alerting fabric your K3 triager subscribes to</td></tr></tbody></table><p>Why this division of labor survives contact with reality: LLM accuracy degrades in very long contexts and counting tasks, while its reasoning over <em>pre-digested</em> facts is excellent.<sup class="footnote-ref" id="fnref-37"><a href="#fn-37">37</a></sup> Compute statistics in code; let K3 do judgment. (Labs 4–5 are built exactly this way: the scripts' <code>--dry-run</code> mode shows you the deterministic half with zero API spend.)</p><h2 id="4-7-where-metasploit-fits-now">4.7 Where Metasploit fits now</h2><p><a href="https://www.metasploit.com/" target="_blank" rel="noopener noreferrer">Metasploit</a> (and related tools such as <a href="https://portswigger.net/burp" target="_blank" rel="noopener noreferrer">Burp Suite</a> and <a href="https://sqlmap.org/" target="_blank" rel="noopener noreferrer">sqlmap</a>) is not obsolete (it is <strong>specialized</strong>). The agentic tools above internally orchestrate the same classes of actions; where the classic frameworks still earn their place:</p><ul><li><strong>Structured validation and retesting</strong> of specific known CVEs with stable, reviewed exploit modules (e.g., confirming a React2Shell patch actually closed the hole on <em>your</em> staging instance).</li><li><strong>Training and calibration:</strong> Metasploitable/DVWA-style ranges remain the best way to build the mental model of what the agents are doing under the hood.</li><li><strong>Regulated engagements</strong> that specify tooling and evidence formats.</li></ul><p>For most small-company defenders, the agentic tools cover routine needs; reach for Metasploit when you need a named, reviewable, repeatable module rather than an autonomous operator. If you operate anything classified as critical infrastructure, that calculus changes: you likely qualify for the restricted programs and should run both stacks.</p><h2 id="4-8-the-evidence-ladder-what-verified-actually-means">4.8 The evidence ladder: what "verified" actually means</h2><p>"Verified" is the most overloaded word in AI-assisted security. A second LLM reviewing a finding (our Lab 3), a pentest agent's working exploit (Shannon), and a human re-firing the original attack path after a patch (Lab 6) are three different kinds of evidence, and treating them as equivalent is how false positives ship to backlogs and false closures ship to production. Label every finding with its rung on the ladder:</p><table><thead><tr><th>Level</th><th>Name</th><th>What it means</th></tr></thead><tbody><tr><td><strong>E0</strong></td><td>Hypothesis</td><td>A model or person suspects an issue.</td></tr><tr><td><strong>E1</strong></td><td>Deterministic signal</td><td>A rule, scanner, configuration observation, or log event supports it.</td></tr><tr><td><strong>E2</strong></td><td>Reachable path</td><td>Sources, transformations, controls, and sink form a plausible attack path.</td></tr><tr><td><strong>E3</strong></td><td>Reproduced impact</td><td>An authorized test, PoC, failing security test, or runtime observation demonstrates impact.</td></tr><tr><td><strong>E4</strong></td><td>Verified closure</td><td>The fix is applied, the original test fails safely, regression tests pass, and an independent verifier confirms closure.</td></tr></tbody></table><p>How the tools in this part map:</p><ul><li><code>code_audit.py --dry-run</code> heuristics produce <strong>E1</strong>; the model fan-out with evidence and attack paths produces <strong>E2 candidates</strong>; the <code>--verify</code> pass is a fresh-context review that <em>confirms or rejects the E2 reasoning</em>. It does not create E3, because nothing has touched a running system.</li><li>Shannon and Strix earn their keep precisely at <strong>E3</strong>: "no exploit, no report" means every finding arrives with reproduced impact (§4.1). That is why their reports are short and their false-positive rate is low.</li><li><strong>Closure requires E4.</strong> A patch plus the same instrument that found the issue now failing (Lab 6) plus regression tests plus an independent check. "The model says it's fixed" is E0 with extra steps.</li></ul><p>Two operating rules fall out of the ladder. First, <strong>reports must label the rung</strong>: a backlog that mixes E0 hypotheses with E3 proofs is not a backlog, it's noise; triage by level. Second, <strong>escalate evidence before escalating severity</strong>. Before an E2 finding gets a critical label and an engineer's weekend, spend the thirty minutes to reach E3. The ladder is also the honest answer to the benchmark question: when Semgrep measures precision on scanner output,<sup class="footnote-ref" id="fnref-44-2"><a href="#fn-44">44</a></sup> they are measuring E1/E2 quality: your harness's job is to push findings up the ladder before they cost human time.</p><hr><h1 id="part-v-build-your-own-ai-security-harness">Part V: Build Your Own AI Security Harness</h1>
+<p>Off-the-shelf agents cover the common cases. The durable skill (the one that transfers when tools change) is <strong>wiring a frontier model into your own security loops</strong>. This part covers the two patterns practitioners converge on (divide-and-conquer analysis and tool-plus-analyst), the three orchestration strategies available in 2026 (native subagents, prompt-directed fan-out, deterministic scripts), and how to choose between them.</p><h2 id="5-1-why-the-one-shot-whole-codebase-prompt-fails">5.1 Why the one-shot whole-codebase prompt fails</h2><p>The naive move (paste the repo into a giant prompt and ask "find the vulnerabilities") fails three ways:</p><ol><li><strong>Accuracy decays with context fill.</strong> Independent harness testing keeps reproducing the finding that model accuracy drops meaningfully once conversations push into the high tens of thousands of tokens; more context makes models <em>dumber</em> past a threshold, not smarter.<sup class="footnote-ref" id="fnref-37-2"><a href="#fn-37">37</a></sup> K3's own launch data echoes it: on BrowseComp, selective context compaction at 300K (91.2) beat dumping the full 1M window (90.4).<sup class="footnote-ref" id="fnref-23-9"><a href="#fn-23">23</a></sup> A bigger window is headroom, not a strategy.</li><li><strong>You get a sermon, not a schema.</strong> Whole-repo prompts produce prose summaries with uneven coverage: some files audited three times, some never touched, no dedupe, no verification, no way to CI it.</li><li><strong>Cost and latency scale the wrong way.</strong> You pay full price to re-read the entire codebase for every question, instead of paying small prices to read the right files deeply.</li></ol><p>Independent measurements back both halves of this. Semgrep's 2026 benchmark ran the same models through two different scanning harnesses and watched rankings reshuffle. Kimi K3's F1 moved from 0.340 with simple guided prompts to 0.400 in a richer multimodal harness, and <em>every</em> model degraded sharply on the largest repository.<sup class="footnote-ref" id="fnref-44-3"><a href="#fn-44">44</a></sup> Aikido's CVE-reproduction benchmark adds the economic half: several runs of a cheap model approximated one run of a flagship, so repeated well-sharded passes beat single heroic prompts.<sup class="footnote-ref" id="fnref-48"><a href="#fn-48">48</a></sup> Divide-and-conquer is not a workaround for weak models; it is how strong models are used correctly.</p><p>The fix is the pattern that has shown up in practitioner write-ups all year: <strong>divide and conquer with function-to-file granularity</strong>: plan first, fan out small, verify hard, aggregate deterministically.</p><h2 id="5-2-the-divide-and-conquer-audit-loop">5.2 The divide-and-conquer audit loop</h2><p>This is the reference architecture implemented by <code>code_audit.py</code> in the exercise pack (Lab 3), and it generalizes to nearly every security-analysis task:</p><pre><code>        ┌─────────────┐
+        │ 1. MAP      │  Walk the repo. Build a compact map: paths, sizes,
+        │ (no model)  │  framework hints, entry points. Pure code.
+        └──────┬──────┘
+               ▼
+        ┌─────────────┐
+        │ 2. PLAN     │  K3 sees the MAP ONLY (small context) and ranks the
+        │ (1 call)    │  files most worth auditing, with reasons. You cap N.
+        └──────┬──────┘
+               ▼
+        ┌─────────────┐
+        │ 3. FAN-OUT  │  One small call per file (or per function-chunk for
+        │ (N calls,   │  big files). Strict JSON schema. Parallel workers.
+        │ parallel)   │  Each call is stateless → cheap to retry, cache, CI.
+        └──────┬──────┘
+               ▼
+        ┌─────────────┐
+        │ 4. FAN-IN   │  Deterministic aggregation: dedupe by
+        │ (no model)  │  (file, line, category), sort by severity.
+        └──────┬──────┘
+               ▼
+        ┌─────────────┐
+        │ 5. VERIFY   │  Second pass per critical/high finding, in a fresh
+        │ (K calls)   │  context: "prove the attack path or downgrade."
+        └──────┬──────┘  Kills the LLM false-positive rate where it lives.
+               ▼
+        ┌─────────────┐
+        │ 6. REPORT   │  JSON + Markdown artifacts with evidence, attack
+        │ (no model)  │  path, fix, and validation steps per finding.
+        └─────────────┘</code></pre><p>Design principles worth stealing:</p><ul><li><strong>Small, stateless calls.</strong> Each fan-out call sees one file plus a system prompt (nothing else). No conversation history to manage, no cross-contamination between files, and K3's multi-turn thinking-history sensitivity never enters the picture.<sup class="footnote-ref" id="fnref-23-10"><a href="#fn-23">23</a></sup></li><li><strong>The model proposes, code disposes.</strong> Anything countable (dedupe, sorting, statistics, the repo map itself) is done in Python, not by the model. LLMs are bad at counting and excellent at judgment; allocate accordingly (§4.6).</li><li><strong>Verification is a separate context.</strong> The same conversation that proposed a finding will defend it (anchoring). A fresh, skeptical pass (the "prove it or drop it" prompt in the exercise pack) is what turns a raw LLM audit into a trustworthy backlog. Shannon's whole product philosophy ("no exploit, no report") is this principle, productized.<sup class="footnote-ref" id="fnref-26-6"><a href="#fn-26">26</a></sup></li><li><strong>Schemas or it didn't happen.</strong> JSON-only outputs with <code>title/category/severity/line/evidence/attack_path/fix</code> make findings diffable across runs, which is what turns an audit into a regression suite.</li></ul><p><strong>Granularity guidance:</strong> file-level chunks (≤ ~12k chars) are the sweet spot for most audits; drop to function-level splitting for large files (<code>code_audit.py</code> splits on top-level <code>def</code>/<code>class</code> boundaries) and for targeted re-review of hot spots. Going finer than function-level usually just re-pays context costs (imports, types) without accuracy gains.</p><h2 id="5-3-loops-vs-graphs">5.3 Loops vs. graphs</h2><p>The trending vocabulary, made concrete:</p><ul><li>A <strong>loop</strong> is linear and re-entrant: <em>map → plan → fan-out → fan-in → verify → (optionally) re-plan on what was found.</em> Simple, predictable, CI-able. Our audit loop is one.</li><li>A <strong>graph</strong> lets branches route conditionally and agents message each other: Strix's agent graph (recon agent's discovery redirects exploitation agents mid-run) is the packaged example; LangGraph-style orchestration is the framework version.<sup class="footnote-ref" id="fnref-30-3"><a href="#fn-30">30</a></sup><span class="footnote-separator">, </span><sup class="footnote-ref" id="fnref-41"><a href="#fn-41">41</a></sup></li></ul><p>Rule of thumb: <strong>start with a loop; graduate to a graph when the plan itself must change mid-run.</strong> A nightly code audit is a loop. An autonomous pentest (where an SSRF discovery should immediately spawn internal-service probes) is a graph. The failure mode to avoid is graph-shaped complexity for loop-shaped problems: conditional routing multiplies debugging surface and token spend, and most defensive workflows are genuinely linear with a verification branch.</p><h2 id="5-4-three-ways-to-orchestrate-and-when-to-use-each">5.4 Three ways to orchestrate (and when to use each)</h2><h3 id="option-a-native-subagents-in-an-existing-harness">Option A: Native subagents in an existing harness</h3><p>The major agent harnesses now ship sub-agent primitives you can lean on directly:</p><ul><li><strong>Codex (OpenAI):</strong> subagents went GA in March 2026: built-in <code>explorer</code>/<code>worker</code>/<code>default</code> agents plus custom agents defined as TOML files in <code>~/.codex/agents/</code>, each with its own instructions and optional model assignment, invoked by name in prompts ("Have <code>code_mapper</code> trace the path, then <code>ui_fixer</code> implement the fix"). Under the hood the parent gets <code>spawn_agent</code> / <code>wait_agent</code> / <code>send_message</code> / <code>close_agent</code> primitives.<sup class="footnote-ref" id="fnref-38"><a href="#fn-38">38</a></sup><span class="footnote-separator">, </span><sup class="footnote-ref" id="fnref-39"><a href="#fn-39">39</a></sup></li><li><strong>Claude Code:</strong> Agent Teams for parallel sub-agents, project memory via <code>CLAUDE.md</code>, skills. Note the cyber-guardrail caveat from Part III for security-flavored work.</li><li><strong>OpenCode:</strong> the open-source, MIT-licensed, most-starred harness (180k+ stars), with model-agnostic BYOK across 75+ providers, MCP + LSP support, and sub-agents. It is a low-friction path for running a full agent harness on <strong>Kimi K3 via Fireworks</strong> after Fireworks provider settings and the final model ID are configured.<sup class="footnote-ref" id="fnref-40"><a href="#fn-40">40</a></sup></li><li><strong>OpenHands:</strong> the Cloud API/SDK route when you want programmatic multi-conversation orchestration (the Vulnerability Fixer app is the reference implementation).<sup class="footnote-ref" id="fnref-33-2"><a href="#fn-33">33</a></sup></li><li><strong>Pi:</strong> primitives-first with an RPC mode: the right substrate if a coding/security agent is one component of a larger system you are building.<sup class="footnote-ref" id="fnref-37-3"><a href="#fn-37">37</a></sup></li></ul><p><strong>Use when:</strong> a human is in the loop, the task is exploratory (triage this alert, investigate this repo), or you want the harness's sandboxing, permissions, and tool ecosystem for free.</p><h3 id="option-b-prompt-directed-fan-out">Option B: Prompt-directed fan-out</h3><p>Ask the orchestrating model itself to plan and delegate: "You are the lead auditor. List the files worth auditing, then audit them one at a time, tracking findings in JSON. Verify each critical finding before reporting." Modern long-horizon models (K3 included) will spontaneously decompose, spawn subagent calls where the harness allows, and self-verify. Moonshot's K3 is explicitly trained for this, which is also why it needs approval boundaries stated up front.<sup class="footnote-ref" id="fnref-23-11"><a href="#fn-23">23</a></sup></p><p><strong>Use when:</strong> prototyping a workflow before hardening it, one-off investigations, or teaching (it makes the model's decomposition visible and discussable). <strong>Weakness:</strong> non-deterministic (same input, different decomposition), so don't put it in CI, and always pair it with a human or scripted verification gate.</p><h3 id="option-c-deterministic-harness-scripts">Option C: Deterministic harness (scripts)</h3><p>Code drives; the model fills judgment-shaped holes. This is <code>code_audit.py</code> / <code>nmap_triage.py</code> / <code>log_triage.py</code>: the walking, chunking, concurrency, dedupe, statistics, and report rendering are Python; K3 appears only at "plan," "analyze this unit," and "verify this finding."</p><p><strong>Use when:</strong> the workflow runs unattended (nightly, per-PR), must be reproducible and auditable, must enforce budgets, or feeds other systems (ticketing, dashboards). This is where compliance-friendly evidence trails come from.</p><h3 id="decision-matrix">Decision matrix</h3><table><thead><tr><th></th><th>A. Native subagents</th><th>B. Prompt-directed</th><th>C. Deterministic scripts</th></tr></thead><tbody><tr><td>Setup cost</td><td>Low</td><td>Zero</td><td>Medium</td></tr><tr><td>Determinism / reproducibility</td><td>Medium</td><td>Low</td><td>High</td></tr><tr><td>Human in the loop</td><td>Natural</td><td>Natural</td><td>Optional</td></tr><tr><td>CI / scheduled runs</td><td>Possible</td><td>Fragile</td><td>First-class</td></tr><tr><td>Budget control</td><td>Harness-level</td><td>Weak</td><td>Exact</td></tr><tr><td>Custom tool integration</td><td>MCP / harness plugins</td><td>Limited</td><td>Anything Python can reach</td></tr><tr><td>Best for</td><td>Interactive deep-dives</td><td>Prototyping, teaching</td><td>Production security loops</td></tr></tbody></table><p>The pragmatic path most teams take: <strong>prototype with B, operationalize with C, and use A for the messy interactive work in between.</strong> And remember the harness-effect research: the same model swings 5–40 percentage points on agentic benchmarks depending on the harness around it: the engineering <em>outside</em> the model is not packaging, it is capability.<sup class="footnote-ref" id="fnref-37-4"><a href="#fn-37">37</a></sup></p><p>The exercise pack implements one representative of each pattern, so the trade-offs are runnable rather than rhetorical. Here they are answering the same question (the planted SQLi in the sample app):</p><table><thead><tr><th></th><th><code>code_audit.py</code> (C: fan-out)</th><th><code>path_audit.py</code> (C: path bundles, §5.7)</th><th><code>path_agent.py</code> (B/A-style tool loop, Lab 9)</th></tr></thead><tbody><tr><td>Who decides what to read</td><td>The planner, once, then fixed</td><td>The call graph (code decides)</td><td>The model, every round</td></tr><tr><td>Same input twice</td><td>Same files, similar findings</td><td>Same bundles, similar findings</td><td>Different path, variable cost</td></tr><tr><td>Coverage guarantee</td><td>"Files the planner picked"</td><td>Every entry point, enumerated</td><td>None. Stops when satisfied</td></tr><tr><td>The <code>/user</code> SQLi</td><td>Flagged inside the <code>app.py</code> chunk</td><td>Flagged with entry point, hops, verdict</td><td>Found by exploration</td></tr><tr><td>CI-worthy?</td><td>Yes</td><td>Yes</td><td>No. Exploration, not evidence</td></tr></tbody></table><p>None is "best." The first two are production loops with different units of analysis (§5.7 is why paths usually win); the third is how you investigate when you cannot enumerate the space in advance, and it is the reference skeleton for building your own agent (Lab 9).</p><h2 id="5-5-context-engineering-for-security-work">5.5 Context engineering for security work</h2><ul><li><strong>1M context is for holding the case, not for skipping design.</strong> Whole-incident log sets, a full pentest transcript, the complete audit state: K3's window gives an IR copilot session room to preserve context (Part VI, Lab 7). Per-unit analysis still works best small and focused (§5.1).</li><li><strong>Cache-friendly prompt structure.</strong> K3's cached-input price is a tenth of fresh input, and Moonshot reports &gt;90% cache hit rates on programming traffic: put your stable system prompt and schemas first, vary only the tail (the file/log chunk), and fan-out costs collapse.<sup class="footnote-ref" id="fnref-23-12"><a href="#fn-23">23</a></sup></li><li><strong>Reasoning budget is real budget.</strong> K3 always reasons (effort configurable, max by default); a <code>max_tokens</code> ceiling that's too small returns empty completions. The scripts default to 8–16k for analysis calls for this reason, and the pack's client exposes <code>reasoning_effort</code> for cheap bulk passes.<sup class="footnote-ref" id="fnref-23-13"><a href="#fn-23">23</a></sup><span class="footnote-separator">, </span><sup class="footnote-ref" id="fnref-46-4"><a href="#fn-46">46</a></sup></li><li><strong>Measure your spend, don't vibe it.</strong> The pack's client accumulates token usage per run (cached vs. fresh input, output) and estimates cost from a price table you can override; <code>run-manifest.json</code> records both. Budgets for fan-out loops become a measurement, not a guess.</li><li><strong>Fresh context beats long context for verification.</strong> Skeptical second passes should not inherit the proposing conversation (§5.2). The exception is deliberate tool loops: the client's <code>chat_with_tools</code> preserves complete assistant messages (reasoning fields included) per the K3 docs, and Lab 9 exercises this hands-on.<sup class="footnote-ref" id="fnref-46-5"><a href="#fn-46">46</a></sup></li></ul><h2 id="5-6-guardrails-for-defender-agents">5.6 Guardrails for defender agents</h2><p>Your analysis agents read hostile-adjacent material all day: attack payloads, untrusted repos, logs full of attacker-controlled strings. That makes <em>them</em> prompt-injection targets (Shannon's docs warn about this explicitly for white-box scanning).<sup class="footnote-ref" id="fnref-26-7"><a href="#fn-26">26</a></sup> Rules:</p><ol><li><strong>Scope files for every run.</strong> Explicit targets, explicit exclusions (avoid rules), explicit environment (never production without a change ticket).</li><li><strong>Approval gates on side effects.</strong> Reading and reporting are free; mutating (create user, send request that changes state, apply a patch) requires a human or a ticket. Encode this in AGENTS.md. K3 resolves ambiguity proactively, so write your boundaries down.<sup class="footnote-ref" id="fnref-23-14"><a href="#fn-23">23</a></sup></li><li><strong>Sandbox execution.</strong> Agents run in containers (Strix and Shannon both do this by default) with no standing credentials beyond the task's needs.</li><li><strong>Untrusted-content isolation.</strong> When the model analyzes potentially attacker-controlled text (logs, payloads, third-party code), the system prompt must say: this is <em>evidence to analyze</em>, never instructions to follow (ASI01/ASI06, and the EchoLeak lesson).<sup class="footnote-ref" id="fnref-14-3"><a href="#fn-14">14</a></sup></li><li><strong>Log the agent.</strong> Every action, every tool call, every finding: your defender agents should meet the evidentiary bar you expect from your attackers' forensic trail.</li></ol><h2 id="5-7-from-files-to-paths-making-reachability-the-unit-of-work">5.7 From files to paths: making reachability the unit of work</h2><p>The flat audit loop of §5.2 answers "what looks dangerous in this file?" A triage engineer's actual question is different: <strong>"can an attacker reach this, and along which path?"</strong> Those are different units of work, and confusing them is how backlogs fill with unexploitable findings in dead code while reachable paths through clean-looking files go unexamined.</p><p>The upgrade keeps the same discipline (deterministic outer structure, model judgment inside) but changes what the deterministic part builds. <code>repo_index.py</code> and <code>path_audit.py</code> in the exercise pack implement it (Lab 8):</p><ol><li><strong>Index before you prompt.</strong> Parse the repo into a structural index: functions with line ranges, imports, a best-effort static call graph, entry points (HTTP routes, CLI mains, task workers), and per-function taint markers (where request data enters, where dangerous operations live). The parsing layer is <strong>Tree-sitter</strong>, the incremental, error-tolerant parser library behind GitHub code navigation and most modern editor/static-analysis tooling: one grammar per language (the pack loads Python, JavaScript, and TypeScript/TSX), one structural API across all of them, and no failures on partially broken files. Tree-sitter builds the syntax trees; the call-graph edges come from explicit, inspectable name-resolution code on top. Pure code, no model, fully reproducible.</li><li><strong>Build the risk queue from structure, not vibes.</strong> Entry points with reachable sinks first; then <em>orphan sinks</em> (dangerous functions no entry point reaches statically: dead code or a missed path, either way worth a look); then module-level code and unparsed files.</li><li><strong>Bundle paths, not files.</strong> The analysis unit sent to the model is one entry point plus the functions reachable from it in the call graph: the same bounded, small-context discipline as §5.2, but a bundle now contains <em>an attack path's worth of context</em> instead of an arbitrary file slice. A sink three calls deep in a boring database module gets reviewed <strong>with</strong> the route that reaches it.</li><li><strong>Audit the path.</strong> The model's job changes accordingly: not "find issues in this file" but "is this sink reachable from this entry point, along which hops, with what impact?", with the same strict-JSON discipline and a sharper question.</li><li><strong>Hand confirmed paths to dynamic verification.</strong> Static reachability tops out at E2 on the evidence ladder (§4.8). Confirmed critical/high paths are written to <code>dynamic-verification-targets.md</code>: a work order for Strix/Shannon (Labs 1–2). Dynamic reproduction can raise a finding to E3. E4 requires a fix, regression test, failed original exploit, and independent closure check. The audit harness never fires exploits itself.</li><li><strong>Cluster by root cause before ticketing.</strong> Nine findings with one missing input-validation helper are one fix. Deterministic clustering (same sink site, same defect class) turns a findings list into a fix list.</li><li><strong>Re-verify on the path, not the repo.</strong> After a fix, re-run the affected bundle with a fresh-context verifier (<code>--verify-model</code>), add a regression test, and replay the original exploit path. Fix → regression → retest is the loop that keeps E4 honest (Lab 8, step 4).</li></ol><p>Two consequences worth internalizing:</p><ul><li><strong>Coverage becomes checkable.</strong> The index knows every entry point and every function; the bundle list records what was actually analyzed. "Which routes has no one looked at?" becomes a query, not a worry. <code>path-bundles.json</code> answers it per run.</li><li><strong>"No path found" is not "safe."</strong> Static call graphs miss dynamic dispatch, framework magic, and string-based routing, whatever the parser. An orphan sink means "no path found <em>statically</em>", which is why dynamic verification (step 5) is a stage of the pipeline, not an optional extra. Languages without a loaded Tree-sitter grammar are indexed by path and audited as whole-file bundles, so coverage degrades visibly rather than silently.</li></ul><h3 id="the-sample-app-seen-both-ways">The sample app, seen both ways</h3><table><thead><tr><th></th><th>Flat audit (Lab 3)</th><th>Path-centric audit (Lab 8)</th></tr></thead><tbody><tr><td>Unit of analysis</td><td>File / chunk</td><td>Entry point + reachable call chain</td></tr><tr><td>SQLi in <code>app.py</code></td><td>"SQL injection at line 51"</td><td>"<code>GET /user</code> → <code>user_lookup</code> → <code>get_db</code> → <code>conn.execute</code>. Reachable, unauthenticated"</td></tr><tr><td>Backlog shape</td><td>7 findings</td><td>Findings clustered by root cause; entry-point coverage stated</td></tr><tr><td>Post-fix check</td><td>Re-audit the file</td><td>Re-verify the path (<code>--verify-model</code>)</td></tr></tbody></table><p>On the one-file training app the difference is modest (everything is in <code>app.py</code>). On a real repo, where the route lives in <code>routes.py</code> and the sink sits three imports deep in <code>db.py</code>, the flat audit flags the sink <em>without knowing the route reaches it</em>, and cannot separate "exploitable tonight" from "theoretical." That sentence, <strong>reachable, from this route, along this path</strong>, is what prioritization actually is.</p><hr><h1 id="part-vi-live-pocs-and-exercises">Part VI: Live POCs and Exercises</h1>
+<p>Ten labs, ordered to build on each other. Lab 0 is setup; Labs 1–2 are the packaged agentic pentesters; Labs 3–5 are the custom K3 loops from Part V; Lab 6 closes the fix loop; Lab 7 is the team tabletop; Lab 8 upgrades the audit from files to attack paths; Lab 9 is an optional capstone for readers building their own agents. Run them by <strong>track</strong>: the full set end-to-end is well over a day, so don't try:</p><table><thead><tr><th>Track</th><th>Audience</th><th>Labs</th><th>Realistic time</th></tr></thead><tbody><tr><td><strong>Foundation</strong> (the one-day workshop)</td><td>Builders, ops leads, non-infosec</td><td>0, 5, 7 + Part II checklist review</td><td>~4.5 h</td></tr><tr><td><strong>AppSec engineering</strong></td><td>Developers shipping code</td><td>0, 1, 2, 3, 6, 8</td><td>1.5 days (Labs 1–2 mostly unattended)</td></tr><tr><td><strong>Frontier security</strong></td><td>Security professionals</td><td>1, 2, 3, 4, 6, 8 (+ 9 if building agents) + evaluation extensions</td><td>Self-paced</td></tr></tbody></table><p>The Foundation track is the workshop to give a whole portfolio company; AppSec is the engineering team's on-ramp; Frontier is for the people who will run the program: its extension work (model/harness bake-offs on your own repos, using the Semgrep methodology of measuring on <em>your</em> code before trusting anyone's benchmark)<sup class="footnote-ref" id="fnref-44-4"><a href="#fn-44">44</a></sup> is where the tool decisions get made with evidence instead of marketing. Everything targets local, disposable systems: the included training app, the included sample data, or OWASP Juice Shop.</p><p>The exercise pack lives alongside this document in <code>exercises/</code> (scripts, sample targets, prompt library). Every script runs <strong>offline in <code>--dry-run</code> mode</strong> so you can validate the pipeline before spending a token.</p><h2 id="lab-0-workbench-30-min">Lab 0: Workbench (30 min)</h2><p><strong>Objective.</strong> A working K3-on-Fireworks environment and the practice targets running.</p><pre><code class="language-bash"># 1. API access
+export FIREWORKS_API_KEY="fw_..."        # fireworks.ai → Settings → API Keys
+cd exercises &amp;&amp; pip install -r requirements.txt
+python3 scripts/k3_client.py --check     # expect: "Connection OK"
+
+# 2. Practice target: OWASP Juice Shop (Docker)
+#    NOTE the binding: 127.0.0.1 only. A deliberately vulnerable app on
+#    0.0.0.0 is reachable by everything on your network; don't.
+docker run --rm -d --name juice-shop -p 127.0.0.1:3000:3000 bkimminich/juice-shop
+# browse http://localhost:3000 (the deliberately insecure training app)
+# Even better: run it in a dedicated Docker network with no outbound access.
+
+# 3. Optional alternates: DVWA (docker run --rm -d -p 127.0.0.1:8080:80 vulnerables/web-dvwa)
+#    and the pack's sample-vuln-app (static target, no server needed)</code></pre><p><strong>Checkpoint.</strong> <code>k3_client.py --check</code> prints provider, model, latency, and a round-trip response. If the model ID 404s, check the Fireworks models page for the exact K3 listing and set <code>K3_MODEL</code> accordingly.<sup class="footnote-ref" id="fnref-23-15"><a href="#fn-23">23</a></sup><span class="footnote-separator">, </span><sup class="footnote-ref" id="fnref-24-2"><a href="#fn-24">24</a></sup></p><p><strong>Discussion.</strong> Why do we verify connectivity before anything else? (Every downstream failure looks like a model failure until proven otherwise.) What does the <code>--dry-run</code> mode prove, and what can it never prove?</p><h2 id="lab-1-white-box-agentic-pentest-with-shannon-2-3-h-mostly-unattended">Lab 1: White-box agentic pentest with Shannon (2–3 h, mostly unattended)</h2><p><strong>Objective.</strong> Watch a white-box agent turn source access into proven exploits, and learn to scope it safely.</p><p><strong>Steps.</strong></p><ol><li>Set up Shannon per Part IV §4.1, with your target repo in <code>shannon/repos/</code> (Juice Shop, or your own app's staging branch).<sup class="footnote-ref" id="fnref-28-3"><a href="#fn-28">28</a></sup></li><li>Write the engagement config <em>before</em> starting: test credentials, <code>focus:</code> paths, and <code>avoid:</code> rules (<code>/logout</code>, anything destructive). This is the rules-of-engagement habit that transfers to every agentic tool.</li><li>Launch the run. Expect ~1–1.5 hours and roughly $50 of model spend at reference pricing; the workspace is resumable if interrupted.<sup class="footnote-ref" id="fnref-26-8"><a href="#fn-26">26</a></sup><span class="footnote-separator">, </span><sup class="footnote-ref" id="fnref-27-4"><a href="#fn-27">27</a></sup></li><li>Read the report against the PoCs: for each finding, <strong>replay the proof-of-concept yourself</strong> against the local target. This is the human verification habit. Agent output is evidence, not verdict.</li></ol><p><strong>If evaluating K3 as Shannon's brain:</strong> Shannon 2.0 runs on the Pi harness, so configure K3 through Pi's provider settings (per the repo's current docs), then calibrate: run the same target with the reference model and with K3, and compare findings found, PoC quality, and run stability <em>before</em> trusting a K3-driven run on anything important. Non-reference models are experimental territory; benchmark first, trust second.<sup class="footnote-ref" id="fnref-26-9"><a href="#fn-26">26</a></sup><span class="footnote-separator">, </span><sup class="footnote-ref" id="fnref-47-2"><a href="#fn-47">47</a></sup></p><p><strong>Discussion.</strong> Why does "no exploit, no report" beat a longer findings list? Which of the findings map to which OWASP categories (§2.11)? What guardrails limited the agent's blast radius, and which would you tighten for a staging run with real-ish data?</p><h2 id="lab-2-black-box-agentic-pentest-with-strix-on-k3-2-h">Lab 2: Black-box agentic pentest with Strix on K3 (2 h)</h2><p><strong>Objective.</strong> Run the external-attacker simulation (no source access, K3 as the brain) and wire it toward CI.</p><p><strong>Steps.</strong></p><pre><code class="language-bash"># Install Strix from a pinned, reviewed release according to its current docs.
+# Do not pipe remote shell scripts directly into bash.
+export STRIX_LLM="openai/accounts/fireworks/models/kimi-k3"
+export LLM_API_KEY="$FIREWORKS_API_KEY"
+export LLM_API_BASE="https://api.fireworks.ai/inference/v1"
+
+strix --target http://localhost:3000          # Juice Shop from Lab 0</code></pre><p>Watch the agent graph work: recon maps the surface, exploitation agents fan out, findings stream in with PoCs and CVSS/OWASP labels. Then repeat headless, the way CI will see it:<sup class="footnote-ref" id="fnref-29-6"><a href="#fn-29">29</a></sup></p><pre><code class="language-bash">strix -n --target http://localhost:3000 --scan-mode quick   # non-interactive
+echo $?                                                     # non-zero = findings</code></pre><p><strong>CI extension (diff-scoped):</strong> on a PR, <code>strix -n -t ./ --scan-mode quick --scope-mode diff --diff-base origin/main</code> audits only what changed: the per-PR pentest gate from Part IV §4.2.<sup class="footnote-ref" id="fnref-29-7"><a href="#fn-29">29</a></sup></p><p><strong>Discussion.</strong> How did black-box findings differ from Lab 1's white-box results, and what does that teach about coverage? (White-box sees unreachable-from-outside flaws; black-box sees what an attacker actually reaches. You need both.) What did K3's reasoning look like inside the agent traces: tool discipline, recovery from dead ends? Compare cost against the reference model run.</p><p><strong>Looking ahead.</strong> Lab 8 generates exactly the input a dynamic agent wants: <code>dynamic-verification-targets.md</code>, with statically confirmed attack paths, entry points, and safe validation steps. The static → dynamic hand-off you will run there is the production version of this lab's "point Strix at it and see."</p><h2 id="lab-3-divide-and-conquer-code-audit-with-k3-60-90-min">Lab 3: Divide-and-conquer code audit with K3 (60–90 min)</h2><p><strong>Objective.</strong> Run the Part V loop yourself, on the planted training app, and <em>measure</em> why it beats a one-shot prompt.</p><pre><code class="language-bash">cd exercises
+
+# Offline pipeline check first (heuristics stand in for the model):
+python3 scripts/code_audit.py sample-vuln-app --out ./out-dry --dry-run
+
+# The real audit: map → plan → fan-out → fan-in → verify → report
+# (--allow-cloud-upload is the data-policy gate: source leaves your machine
+#  for the hosted endpoint; see the README and §2.3 before enabling.)
+python3 scripts/code_audit.py sample-vuln-app --out ./out --verify --allow-cloud-upload</code></pre><p><strong>What a run leaves behind.</strong> Beyond <code>audit-report.md</code> and <code>audit-findings.json</code>, every run persists <code>audit-plan.json</code> (which files were selected and why), <code>coverage.json</code> (in-scope vs. audited vs. skipped: with reasons), and <code>run-manifest.json</code> (mode, provider/model, structured-output usage, budgets). Audits you can't evidence are just opinions; this is the difference.</p><p><strong>What to observe.</strong></p><ol><li><strong>The plan.</strong> <code>audit-plan.json</code> records which files K3 prioritized and <em>why</em>: for the sample app it should home in on <code>app.py</code>'s endpoints (and it now sees CI configs, Dockerfiles, and <code>.env</code>-style files that naive walkers skip). On a real repo this is the step that saves 80% of spend.</li><li><strong>The findings.</strong> The sample app plants SQLi, command injection, path traversal, SSTI, insecure deserialization, hardcoded secrets, and debug mode (each marked with a <code># VULN</code> comment so you can grade the run). A good run finds all seven classes with evidence and attack paths.</li><li><strong>The verification pass.</strong> <code>--verify</code> re-interrogates each high finding in a fresh context. Watch it downgrade or reject anything it cannot construct an attack path for: and compare against the dry-run heuristic output, which flags everything that pattern-matches (false positives included, by design). On the evidence ladder (§4.8): heuristics produce E1, the fan-out produces E2 candidates, and this pass confirms or rejects the E2 <em>reasoning</em> (it is still static analysis, not runtime proof). That distinction is the whole point of Lab 6.</li><li><strong>The contrast experiment.</strong> Now paste the <em>entire</em> <code>app.py</code> into one K3 chat with "find all vulnerabilities." Compare: coverage, evidence quality, attack-path specificity. On small files the gap is modest; repeat on a 50-file repo and the one-shot approach misses whole files while the loop's coverage is enumerable (this is the §5.1 lesson, felt instead of told).</li></ol><p><strong>Discussion.</strong> Where would you slot this loop in CI (nightly full-repo vs. per-PR diff)? What is the right granularity for your largest repo (§5.2)? What did the run cost, and how much of the prompt was cache-stable?</p><p><strong>Looking ahead.</strong> This lab's unit of analysis is the file. Lab 8 upgrades it to the attack path: same loop discipline, but the model answers "reachable, from this route, along these hops" instead of "this file contains a sink." If you only have time for one more lab after this, make it Lab 8.</p><h2 id="lab-4-network-exposure-triage-nmap-k3-45-min">Lab 4: Network exposure triage: nmap + K3 (45 min)</h2><p><strong>Objective.</strong> The "AI as analyst on classic primitives" pattern (§4.6): deterministic scan, deterministic rules, model judgment.</p><pre><code class="language-bash"># On the included synthetic scan:
+python3 scripts/nmap_triage.py sample-data/nmap-sample.xml --out ./out --dry-run
+python3 scripts/nmap_triage.py sample-data/nmap-sample.xml --out ./out --allow-cloud-upload   # K3 pass
+
+# Then on infrastructure you own:
+nmap -sV -oX my-scan.xml &lt;your-host-or-subnet&gt;
+python3 scripts/nmap_triage.py my-scan.xml --out ./out --allow-cloud-upload</code></pre><p>The sample scan plants a greatest-hits of small-company exposure: MongoDB and Redis on open ports, Telnet, vsftpd 2.3.4, Samba 3.x, RDP, and an exposed Docker socket. The rules pass flags them deterministically; the K3 pass is where the value shows: correlation ("Redis <em>and</em> MongoDB exposed on the same host suggests a missing bind-address default"), version-specific risk, and a prioritized, safe next-step list a non-specialist can execute.</p><p><strong>Discussion.</strong> Why do we forbid the model from running nmap itself (§4.6)? Which findings were rule-caught vs. model-correlated? What would you add to <code>RULES</code> for your own stack?</p><p><strong>Looking ahead.</strong> Note the shape: deterministic primitive, deterministic rules, model judgment: the same "code computes, model assesses" pattern Lab 8 applies to source code, where the deterministic part is a call graph instead of a port scan.</p><h2 id="lab-5-auth-log-anomaly-triage-with-k3-45-min">Lab 5: Auth-log anomaly triage with K3 (45 min)</h2><p><strong>Objective.</strong> Same pattern on detection: code computes, the model assesses.</p><pre><code class="language-bash">python3 scripts/log_triage.py sample-data/auth-sample.log --out ./out --dry-run
+python3 scripts/log_triage.py sample-data/auth-sample.log --out ./out --allow-cloud-upload    # K3 pass</code></pre><p>The sample log plants a classic mini-incident: a 47-failure brute-force burst against <code>admin</code>/<code>root</code> from one IP, a <strong>successful</strong> login from that same IP 26 minutes later (at 00:07), an impossible-travel pair for <code>sandra</code> (office network, then a distant network 18 minutes later), and off-hours access (all buried in ordinary noise). The deterministic pass counts what matters; K3's assessment turns it into severity, timeline, 30-minute containment, follow-up checks, and prevention: the exact shape of a first-responder ticket.</p><p><strong>Extension.</strong> Pipe a week of real auth logs from a host you own through the same script. Then wire it to cron and you've built a $0.05-a-night anomaly detection layer (§2.6) with an analyst attached.</p><p><strong>Discussion.</strong> Where does the model add the most value: detection, or communication? (Notice: the <em>statistics</em> caught everything; the model made it actionable.) How would you raise/lower the burst thresholds for your environment's baseline?</p><h2 id="lab-6-find-fix-verify-closing-the-loop-60-min">Lab 6: Find → fix → verify: closing the loop (60 min)</h2><p><strong>Objective.</strong> The full remediation cycle on one real finding: the muscle this whole playbook exists to build.</p><ol><li><strong>Pick a Lab 3 finding</strong>: the <code>/user</code> SQLi is ideal.</li><li><strong>Fix it with K3 as pair-programmer.</strong> In OpenCode (or any harness pointed at Fireworks), scope the task tightly: <em>"In <code>sample-vuln-app/app.py</code>, the <code>/user</code> endpoint builds SQL with string formatting. Convert to parameterized queries. Change nothing else. List what you changed and why it's safe."</em> Review the diff like any junior's PR.</li><li><strong>Verify with the same instrument that found it.</strong> Re-run <code>code_audit.py</code>: the finding must be gone from the report. Then (because no retest, no fix) fire the original attack path at the running app and confirm it now fails: <code>curl 'http://127.0.0.1:5050/user?username=%27%20OR%201%3D1--'</code> should no longer dump the table. Add a regression test that asserts the endpoint returns only the requested user and cannot be widened by SQL syntax, then run it in CI. This is the full climb to <strong>E4</strong> on the evidence ladder (§4.8): fix applied, original test failing safely, regression test in place, independent confirmation. E4 is the only level at which a finding is allowed to leave the backlog.</li><li><strong>Optionally, automate the whole arc:</strong> run <a href="https://github.com/OpenHands/vulnerability-fixer" target="_blank" rel="noopener noreferrer">OpenHands Vulnerability Fixer</a> on a repository with known dependency CVEs. Trivy finds the issues, agents patch them, pull requests open, and you review.<sup class="footnote-ref" id="fnref-33-3"><a href="#fn-33">33</a></sup></li></ol><p><strong>Discussion.</strong> What belongs in the fix prompt's scope limits? (Unscoped "improve security" edits wander; scoped edits land.) Who approves agent-written security patches in your org, and what's the evidence bar?</p><h2 id="lab-7-incident-response-tabletop-with-a-k3-copilot-90-min-team">Lab 7: Incident-response tabletop with a K3 copilot (90 min, team)</h2><p><strong>Objective.</strong> Rehearse a machine-speed incident at human speed, with K3 as the copilot it would be in a real event.</p><p><strong>Setup.</strong> One facilitator, 2–6 responders, one shared K3 session initialized with <code>prompts/ir-copilot.md</code>. The facilitator holds the injects; the room gets evidence in stages.</p><p><strong>Scenario (60 minutes of injects).</strong></p><table><thead><tr><th>T+</th><th>Inject</th></tr></thead><tbody><tr><td>0:00</td><td>Alert: hosting provider flags unusual egress from <code>web-01</code>. You have last night's auth log (use the Lab 5 sample as the prop).</td></tr><tr><td>0:10</td><td>Log triage (Lab 5's script, or live) shows the brute-force success + impossible travel. Decide: containment actions, in order.</td></tr><tr><td>0:20</td><td>New evidence: <code>admin</code> created a second account <code>support-bot</code> and an API key. Scope widens. What now?</td></tr><tr><td>0:30</td><td>A customer asks publicly whether you're breached. Draft the holding statement. Who approves it?</td></tr><tr><td>0:40</td><td>Forensics artifact: the attacker exfiltrated one database backup. Classify the data (§2.3). Notification obligations?</td></tr><tr><td>0:50</td><td>Eradication &amp; recovery plan: rebuild vs. clean, credential rotation order (remember Hugging Face: revoke, rotate, rebuild).<sup class="footnote-ref" id="fnref-1-4"><a href="#fn-1">1</a></sup></td></tr></tbody></table><p><strong>Variant: run the real July 2026 chain.</strong> For an advanced group, replay the actual Hugging Face incident anatomy: initial access is a zero-day in a third-party package-registry caching proxy; the operator is fully autonomous (no human typing); its objective is data in a production database; and it pivots through stolen credentials toward internet-facing nodes.<sup class="footnote-ref" id="fnref-42-2"><a href="#fn-42">42</a></sup> The room's job goes past containment. The real work is deciding, in advance, the controls that would have prevented it: egress denial from build/research environments, per-environment credential scoping, behavioral monitoring on agent workloads, and named kill-switch authority. That is the OWASP Agentic Top 10 (§2.10) as an agenda, not a poster.</p><p><strong>Why K3 shines here:</strong> the whole incident (every inject, every log excerpt, every decision) fits in one 1M-token session, so the copilot never needs re-briefing; and per the IR-copilot prompt, it keeps a running timeline and will not let the room skip "evidence to preserve."<sup class="footnote-ref" id="fnref-23-16"><a href="#fn-23">23</a></sup> Also note what does <em>not</em> happen: no guardrail refuses to discuss the attack artifacts, the exact wall Hugging Face's responders hit with a gated model.<sup class="footnote-ref" id="fnref-2-3"><a href="#fn-2">2</a></sup></p><p><strong>Debrief.</strong> Where did the room hesitate? (That's the gap in your runbook: fix it in Part VII §7.2 this week.) What did the copilot get wrong, and how did the room catch it? (If nobody can answer the second half, that's the finding.)</p><h2 id="lab-8-path-centric-audit-reachability-clustering-and-the-fix-loop-75-min">Lab 8: Path-centric audit: reachability, clustering, and the fix loop (75 min)</h2><p><strong>Objective.</strong> Upgrade from "findings in files" to "verified attack paths": the workflow difference between a scanner and an auditor (§5.7). Prerequisite: Lab 3.</p><pre><code class="language-bash">cd exercises
+# 1. See what the analyzer sees (no model, fully offline):
+python3 scripts/repo_index.py sample-vuln-app --out ./path-out/repo-index.json
+
+# 2. Offline pipeline check (heuristic path candidates, NOT an audit):
+python3 scripts/path_audit.py sample-vuln-app --out ./path-dry --dry-run
+
+# 3. The real path audit, with fresh-context verification:
+#    (same data-policy gate as Lab 3: source leaves your machine)
+python3 scripts/path_audit.py sample-vuln-app --out ./path-out --verify-model --allow-cloud-upload</code></pre><p><strong>Second target, second language.</strong> The pack ships a twin training app, <code>sample-vuln-js/</code> (Express, five planted classes). Run the same three commands against it: the Tree-sitter JavaScript extractor picks up the Express routes (inline and named handlers alike), and the <code>/users</code> finding traces the injection across files, from the route in <code>server.js</code> into query construction in <code>db.js</code>. If your own estate is polyglot, this is the cheapest way to see what the index does with it.</p><p><strong>What to observe.</strong></p><ol><li><strong>Read the index first.</strong> <code>repo-index.json</code> is what the analyzer can see, parsed by Tree-sitter (Python, JavaScript, TypeScript/TSX grammars; the manifest names the parser used): 8 entry points (7 routes + the <code>__main__</code> startup), 9 functions, the call-graph edge from <code>user_lookup</code> to <code>get_db</code>. On your own repo this is the moment you discover entry points you forgot existed: the index is inventory, and inventory is a control. If your stack mixes Python services with JS/TS frontends, point it at the whole repo and check that both halves show up.</li><li><strong>Compare bundle thinking to file thinking.</strong> <code>path-bundles.json</code> lists each analysis unit: an entry point plus its reachable callees, sinks noted, size-bounded, with entry-point coverage stated (8/8 here). On a real repo, anything under 100% is a named, auditable gap instead of an unknown.</li><li><strong>Grade the findings against Lab 3's.</strong> Same seven planted classes, but each finding now carries an entry point, an explicit hop-by-hop path, a root-cause cluster, and (with <code>--verify-model</code>) a verdict from a fresh-context skeptic. Check <code>/user</code>: the path should read <code>user_lookup → get_db</code> with the sink at line 51.</li><li><strong>Close the loop: the point of the lab.</strong> Fix the planted SQLi as in Lab 6 (parameterized query), then re-run with <code>--verify-model</code>. The finding must close, and the second run's manifest is your regression evidence. This is §5.7 step 7 as muscle memory: <em>the same instrument that found it confirms it is gone.</em></li><li><strong>Hand off what's left.</strong> Open <code>dynamic-verification-targets.md</code>: confirmed high-severity paths formatted as a work order for a dynamic agent. Feed one to your Lab 1/2 setup (Strix or Shannon against the local app) and watch a static E2 finding become a dynamic E3 finding (§4.8). After remediation, the regression test, failed original exploit, and independent closure check establish E4.</li><li><strong>Compare against the expected-output notes.</strong> The training apps contain known planted classes so you can tell whether your harness is producing the right shape of result. Treat the examples as calibration material, not as evidence about your own repo.</li></ol><p><strong>Discussion.</strong> Where does static reachability err in <em>both</em> directions: paths it cannot see (framework magic, dynamic dispatch) and paths it sees that are not real (dead branches)? How would you wire <code>--verify-model</code> into CI: every PR, or nightly on changed-path bundles? What is the entry-point coverage number on your largest service, and who owns closing it?</p><h2 id="lab-9-under-the-hood-a-native-tool-calling-loop-45-min-optional-capstone">Lab 9: Under the hood: a native tool-calling loop (45 min, optional capstone)</h2><p><strong>Objective.</strong> Experience the third orchestration pattern from §5.4 (the model drives, tools answer) by running and reading a minimal one.</p><p><strong>Who this is for: read before running.</strong> This lab is a <em>reference implementation</em> for readers <strong>building their own agentic tooling</strong> on K3, or evaluating whether to. Self-select honestly:</p><ul><li><strong>Relevant</strong> if you want native function-calling done correctly for K3: tool registration, a bounded loop, complete-assistant-message preservation (the multi-turn contract from §3.3), sandboxed read-only tools.</li><li><strong>Interesting</strong> if you want to <em>feel</em> the determinism and cost trade-off between "code drives" (Labs 3, 8) and "model drives."</li><li><strong>Skippable</strong> if you want security answers on your repo. It asks one question, non-deterministically, and finds nothing Lab 8 doesn't. Skipping it costs you nothing operational.</li></ul><pre><code class="language-bash">python3 scripts/path_agent.py sample-vuln-app \
+  --question "Is the SQL injection in app.py reachable from an unauthenticated route?" \
+  --allow-cloud-upload</code></pre><p><strong>What to observe.</strong></p><ol><li><strong>Watch the loop, not the answer.</strong> <code>agent-transcript.json</code> records every round: which tool K3 chose, with what arguments, what came back. A typical run reads the route, searches for auth decorators, then verdicts. The tools are read-only and path-sandboxed to the target directory; the loop is bounded (default 8 rounds); the upload gate is the same as every lab's.</li><li><strong>Ask the same question twice.</strong> Different investigation order, different round count, different cost (usually the same verdict on this tiny app). Now imagine it in CI. That is "least agency" (§2.10) felt instead of told, and why this playbook's production loops are deterministic-outer.</li><li><strong>Read the skeleton.</strong> <code>path_agent.py</code> is ~150 lines of plumbing over <code>chat_with_tools</code> (§5.5): tool specs as JSON Schema, a handler map, and the preserved-message loop. If you are building your own agent, this file plus <code>k3_client.py</code> is the correct minimal starting point. Swap the four read-only tools for your own, keeping the sandbox and the round bound.</li><li><strong>Contrast with the deterministic path.</strong> Run Lab 8 on the same territory and compare: rounds vs. bundles, variable cost vs. manifest cost, exploration vs. coverage guarantee. §5.4's comparison table, now with receipts.</li></ol><p><strong>Discussion.</strong> Where would a tool-calling loop beat the deterministic harness in <em>your</em> environment? (Open-ended incident investigation is the classic answer: you cannot enumerate a call graph for a question you haven't formed yet.) What tools would you add, and what is the approval gate before any of them can write, execute, or send traffic (§5.6)?</p><hr><h1 id="part-vii-operational-playbooks">Part VII: Operational Playbooks</h1>
+<p>Checklists and runbooks that turn Parts I–VI into operations. Copy them into your wiki; assign owners; revisit quarterly.</p><h2 id="7-1-pre-production-hardening-checklist">7.1 Pre-production hardening checklist</h2><p>The vibe-code-to-production gate. Every item maps to a Part II control; nothing ships until every box has an owner.</p><p><strong>Identity &amp; access</strong></p><ul><li>[ ] App sits behind authentication tied to company identity (SSO/org tier). §2.1</li><li>[ ] No shared logins; service accounts are scoped and inventoried. §2.1, §2.10</li><li>[ ] Admin surfaces are not internet-exposed (VPN/allowlist). §2.1</li></ul><p><strong>Secrets &amp; config</strong></p><ul><li>[ ] <code>gitleaks</code>/equivalent clean on the repo; any past hit rotated. §2.2</li><li>[ ] No secrets in env files committed anywhere; manager injection in place. §2.2</li><li>[ ] Debug mode off, TLS verification on, security headers set. §2.5</li></ul><p><strong>Code &amp; supply chain</strong></p><ul><li>[ ] Dependencies pinned; lockfile-diff review habit; Trivy/<code>npm audit</code> in CI. §2.4</li><li>[ ] Agentic pentest run (Shannon white-box and/or Strix black-box) with findings triaged. Part IV</li><li>[ ] Divide-and-conquer audit (Lab 3 loop) on the security-critical modules. Part V</li><li>[ ] AGENTS.md security section in place if coding agents work this repo. §2.5</li></ul><p><strong>Data &amp; logging</strong></p><ul><li>[ ] Data classification written; PII/PHI/PCI flows documented. §2.3</li><li>[ ] Auth + app logs centralized; brute-force and impossible-travel alerts live. §2.6</li><li>[ ] Backups configured <em>and one restore tested</em>. §2.7</li></ul><p><strong>Response readiness</strong></p><ul><li>[ ] Breach runbook location known to on-call. §2.8, §7.2</li><li>[ ] Offboarding checklist exists and was used for the last departure. §2.9</li></ul><h2 id="7-2-incident-response-lite-the-first-60-minutes">7.2 Incident-response lite: the first 60 minutes</h2><p>For the responder who has never done this before. Print it.</p><p><strong>0. You suspect something. Now what?</strong> You are the incident coordinator until relieved. Start a written timeline now: every fact with a timestamp. (Your K3 copilot session from Lab 7 keeps one too; yours is the record of record.)</p><p><strong>First 10 minutes. Confirm and contain (reversibly).</strong></p><ol><li>Verify the signal is real (one log check, one human check). False alarms are fine.</li><li>Contain with reversible actions first: disable the suspect account, block the suspect IP, and isolate the host from the network. Preserve volatile evidence when feasible; if active destructive behavior cannot be contained any other way, prioritize stopping damage and document what you did.</li><li>Preserve: copy the relevant logs somewhere the attacker can't reach. Assume the attacker can see the compromised box. Coordinate from a clean device/channel.</li></ol><p><strong>Minutes 10–30. Scope and call for help.</strong></p><ol><li>Scope the blast radius: what did the account/host touch? Which credentials lived there?</li><li>Escalate per your runbook: leadership, your security contact, external IR counsel if it looks big (active ransomware, confirmed data theft, regulated data). Saying "this is beyond us" early is competence, not failure.</li><li>Rotate credentials in dependency order: identity provider first, then cloud, then the affected services, then user-facing.</li></ol><p><strong>Minutes 30–60. Stabilize and communicate.</strong></p><ol><li>Short, honest internal note: what we know, what we're doing, what's next, when the next update comes.</li><li>External comms only from the named spokesperson; drafts reviewed by leadership (and counsel if data was taken).</li><li>Open the recovery track: rebuild-from-known-good beats clean-in-place for anything the attacker touched (Hugging Face rebuilt compromised nodes from scratch).<sup class="footnote-ref" id="fnref-1-5"><a href="#fn-1">1</a></sup></li></ol><p><strong>Never in the first hour:</strong> wipe evidence, negotiate with attackers, announce attribution you don't have, or log into compromised systems with privileged credentials.</p><h2 id="7-3-bcp-dr-lite">7.3 BCP/DR lite</h2><p>Business continuity for teams without a continuity team.</p><ul><li><strong>Know your two numbers.</strong> RTO (how long can you be down?) and RPO (how much data can you lose?). Write them per system; they drive every other decision. A honest "4 hours / 15 minutes" beats an aspirational zero you never engineered for.</li><li><strong>3-2-1 backups, restore-tested quarterly</strong> (§2.7). An untested backup is a rumor.</li><li><strong>Degrade deliberately.</strong> Decide now what "minimum viable service" looks like during an incident (read-only mode? status page + manual intake?) and write the three steps to get there.</li><li><strong>Vendor failure is in scope.</strong> Your model provider, your hosting provider, your IdP: each gets a "what if it's down or cut off tomorrow?" answer (Part III §3.2 is the AI-specific version; the June 2026 Fable/Mythos suspension is why it's not hypothetical).<sup class="footnote-ref" id="fnref-9-3"><a href="#fn-9">9</a></sup></li><li><strong>Tabletop twice a year.</strong> Lab 7's scenario, your org's cast. Ninety minutes, twice a year, is the cheapest insurance you will ever buy.</li></ul><h2 id="7-4-supply-chain-and-ai-agent-hygiene-recurring">7.4 Supply-chain and AI-agent hygiene (recurring)</h2><ul><li><strong>Weekly:</strong> review dependency-update PRs (not blind-merge); check <code>gitleaks</code> CI is green; glance at agent-action logs for anything outside scope.</li><li><strong>Monthly:</strong> eliminate long-lived credentials where possible, review the remaining ones, and rotate on exposure, role change, or defined risk-based schedules; review new tools/plugins added to CI and agents (the LiteLLM lesson: security tools are supply chain too);<sup class="footnote-ref" id="fnref-18-2"><a href="#fn-18">18</a></sup><span class="footnote-separator">, </span><sup class="footnote-ref" id="fnref-19-2"><a href="#fn-19">19</a></sup> run the Strix diff-scope report across merged PRs.</li><li><strong>Quarterly:</strong> full agentic pentest (Lab 1/2) on the flagship app; review agent permissions against least-agency (ASI02/ASI03);<sup class="footnote-ref" id="fnref-14-4"><a href="#fn-14">14</a></sup> re-run the Lab 3 audit on new modules; test one restore.</li></ul><h2 id="7-5-metrics-that-matter">7.5 Metrics that matter</h2><p>Track five, ignore the vanity fifty:</p><table><thead><tr><th>Metric</th><th>Target direction</th><th>Why</th></tr></thead><tbody><tr><td>Mean time to patch critical CVEs in your stack</td><td>Down (days, not weeks)</td><td>React2Shell-class events are the new normal<sup class="footnote-ref" id="fnref-15-2"><a href="#fn-15">15</a></sup></td></tr><tr><td>Findings → verified-fix closure rate</td><td>Up toward 100%</td><td>Discovery is cheap; closure is security (§4.5)</td></tr><tr><td>% of apps behind SSO/company identity</td><td>100%</td><td>The §2.1 gap is where breaches start</td></tr><tr><td>Time-to-detect in tabletop exercises</td><td>Down each run</td><td>Detection is a muscle (Lab 7)</td></tr><tr><td>Secrets found in repos per quarter</td><td>Zero</td><td>§2.2, forever</td></tr></tbody></table><hr><h1 id="part-viii-the-30-60-90-day-rollout">Part VIII: The 30/60/90-Day Rollout</h1>
+<p>For a portfolio company (or any small team) starting from "we ship fast and hope."</p><p><strong>Days 1–30. Stop the bleeding.</strong> Controls §2.1–§2.3 (SSO org tiers, secret scan + rotation, data classification page), Lab 0 workbench, Lab 5 log triage wired to cron, breach runbook drafted and pinned. <strong>Exit criteria:</strong> no app without auth, no unrotated known-leaked secret, logs queryable, one page that says who to call.</p><p><strong>Days 31–60. See yourself.</strong> Controls §2.4–§2.7, first Shannon white-box run (Lab 1) and Strix external run (Lab 2) on the flagship app, Lab 3 audit loop in nightly CI, findings backlog triaged with owners. <strong>Exit criteria:</strong> a living findings backlog with severity, owner, and verification per item; nightly automated audits; one tested restore.</p><p><strong>Days 61–90. Close the loop and rehearse.</strong> Controls §2.8–§2.10, fix-loop automation (Lab 6 pattern, optionally <a href="https://github.com/OpenHands/vulnerability-fixer" target="_blank" rel="noopener noreferrer">OpenHands Vulnerability Fixer</a>), per-PR diff-scoped agentic testing in CI, Lab 7 tabletop with the full team, metrics dashboard (§7.5). <strong>Exit criteria:</strong> findings close with retest evidence; CI blocks on new high-severity findings; the team has run one full IR rehearsal and patched the runbook gaps it exposed.</p><p>Then it becomes cadence (§7.4): weekly, monthly, quarterly. Security is a rhythm, not a project.</p><p><strong>Making it assignable.</strong> A companion internal document (the <strong>Portfolio Security Control Pack</strong>) turns this rollout into fill-in templates: the ten controls as a policy page, a vendor/account governance checklist, the data-classification one-pager, the 2 a.m. breach runbook, an AI tool and agent usage policy, a quarterly scorecard (including an S-level target per critical workload, §3.5), and the 30/60/90 plan as owner-and-date work items. The pack is internal working material; this playbook is the public explanation. Keep them in sync.</p><hr><h1 id="appendices">Appendices</h1>
+<h2 id="a-tool-matrix">A. Tool matrix</h2><table><thead><tr><th>Tool</th><th>Category</th><th>Mode</th><th>K3 route</th><th>Cost to start</th></tr></thead><tbody><tr><td><strong>Kimi K3 on Fireworks</strong></td><td>Frontier model (defensive brain)</td><td>API, OpenAI-compatible</td><td>native</td><td>$3.00/M input; $0.30/M cached input; $15.00/M output</td></tr><tr><td><strong>Shannon</strong></td><td>Agentic pentest</td><td>White-box</td><td>Anthropic-compatible endpoint (community)</td><td>OSS (AGPL); ~$50/run reference<sup class="footnote-ref" id="fnref-26-10"><a href="#fn-26">26</a></sup><span class="footnote-separator">, </span><sup class="footnote-ref" id="fnref-27-5"><a href="#fn-27">27</a></sup></td></tr><tr><td><strong>Strix</strong></td><td>Agentic pentest</td><td>Black/grey/white + CI</td><td>Native via LiteLLM OpenAI-compatible</td><td>OSS; per-run model spend<sup class="footnote-ref" id="fnref-29-8"><a href="#fn-29">29</a></sup></td></tr><tr><td><strong>Pensar Apex</strong></td><td>Agentic pentest</td><td>Black/white/targeted</td><td>Via OpenRouter/vLLM</td><td>OSS; per-run model spend<sup class="footnote-ref" id="fnref-31-3"><a href="#fn-31">31</a></sup></td></tr><tr><td><a href="https://github.com/OpenHands/vulnerability-fixer" target="_blank" rel="noopener noreferrer"><strong>OpenHands Vulnerability Fixer</strong></a></td><td>Fix loop</td><td>Repo scan or SARIF upload → PR</td><td>Any OpenHands-supported LLM</td><td>OSS (MIT)<sup class="footnote-ref" id="fnref-33-4"><a href="#fn-33">33</a></sup></td></tr><tr><td><strong>OpenCode</strong></td><td>Agent harness</td><td>Interactive agent</td><td>Native Fireworks provider</td><td>OSS (MIT)<sup class="footnote-ref" id="fnref-40-2"><a href="#fn-40">40</a></sup></td></tr><tr><td><strong>Codex / Claude Code / Pi / OpenHands</strong></td><td>Agent harnesses</td><td>Subagents, teams</td><td>Varies (K3 via custom providers)</td><td>Subscriptions / API<sup class="footnote-ref" id="fnref-38-2"><a href="#fn-38">38</a></sup><span class="footnote-separator">, </span><sup class="footnote-ref" id="fnref-39-2"><a href="#fn-39">39</a></sup></td></tr><tr><td><strong><a href="https://nmap.org/" target="_blank" rel="noopener noreferrer">nmap</a>, <a href="https://semgrep.dev/" target="_blank" rel="noopener noreferrer">semgrep</a>, <a href="https://github.com/aquasecurity/trivy" target="_blank" rel="noopener noreferrer">Trivy</a>, <a href="https://github.com/projectdiscovery/nuclei" target="_blank" rel="noopener noreferrer">nuclei</a>, <a href="https://github.com/gitleaks/gitleaks" target="_blank" rel="noopener noreferrer">gitleaks</a></strong></td><td>Classic primitives</td><td>Deterministic scans</td><td>Analyst layer via scripts</td><td>Free/OSS</td></tr><tr><td><strong><a href="https://wazuh.com/" target="_blank" rel="noopener noreferrer">Wazuh</a> / <a href="https://www.snort.org/" target="_blank" rel="noopener noreferrer">Snort</a></strong></td><td>Detection</td><td>SIEM/IDS/IPS</td><td>Alert triage via scripts</td><td>Free/OSS</td></tr><tr><td><strong><a href="https://www.metasploit.com/" target="_blank" rel="noopener noreferrer">Metasploit</a> / <a href="https://portswigger.net/burp" target="_blank" rel="noopener noreferrer">Burp</a></strong></td><td>Exploitation frameworks</td><td>Targeted validation</td><td></td><td>OSS / commercial</td></tr><tr><td><strong>Exercise pack scripts</strong></td><td>Custom K3 loops</td><td>Audit/triage/assess</td><td>Native (Fireworks + Moonshot)</td><td>This pack</td></tr></tbody></table><h2 id="b-resource-directory">B. Resource directory</h2><p><strong>Frameworks and references:</strong> <a href="https://owasp.org/Top10/2025/" target="_blank" rel="noopener noreferrer">OWASP Web Top 10 (2025)</a>,<sup class="footnote-ref" id="fnref-11-2"><a href="#fn-11">11</a></sup> <a href="https://genai.owasp.org/llm-top-10/" target="_blank" rel="noopener noreferrer">OWASP LLM Top 10</a>,<sup class="footnote-ref" id="fnref-12-2"><a href="#fn-12">12</a></sup> <a href="https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/" target="_blank" rel="noopener noreferrer">OWASP Agentic Top 10 (2026)</a>,<sup class="footnote-ref" id="fnref-13-3"><a href="#fn-13">13</a></sup> <a href="https://attack.mitre.org/" target="_blank" rel="noopener noreferrer">MITRE ATT&amp;CK</a>,<sup class="footnote-ref" id="fnref-20-2"><a href="#fn-20">20</a></sup> <a href="https://csrc.nist.gov/pubs/sp/800/207/final" target="_blank" rel="noopener noreferrer">NIST SP 800-207 Zero Trust</a>,<sup class="footnote-ref" id="fnref-21-2"><a href="#fn-21">21</a></sup> <a href="https://www.lockheedmartin.com/en-us/capabilities/cyber/cyber-kill-chain.html" target="_blank" rel="noopener noreferrer">Lockheed Martin Cyber Kill Chain</a>,<sup class="footnote-ref" id="fnref-22-2"><a href="#fn-22">22</a></sup> and <a href="https://www.cve.org/" target="_blank" rel="noopener noreferrer">CVE.org</a>.</p><p><strong>Learning targets for authorized practice:</strong> <a href="https://owasp.org/www-project-juice-shop/" target="_blank" rel="noopener noreferrer">OWASP Juice Shop</a>, <a href="https://github.com/digininja/DVWA" target="_blank" rel="noopener noreferrer">DVWA</a>, and <a href="https://docs.rapid7.com/metasploit/metasploitable-2/" target="_blank" rel="noopener noreferrer">Metasploitable</a> are local, disposable targets.</p><p><strong>Threat intelligence:</strong> <a href="https://threatmap.checkpoint.com/" target="_blank" rel="noopener noreferrer">Check Point Live Cyber Threat Map</a>, <a href="https://talosintelligence.com/" target="_blank" rel="noopener noreferrer">Talos Intelligence</a>, and the <a href="https://www.cisa.gov/known-exploited-vulnerabilities-catalog" target="_blank" rel="noopener noreferrer">CISA Known Exploited Vulnerabilities Catalog</a>. Prioritize vulnerabilities with documented exploitation in the wild. Palo Alto Networks provides a current vendor survey in its Defender Guide to the Frontier AI Impact on Cybersecurity.<sup class="footnote-ref" id="fnref-6"><a href="#fn-6">6</a></sup></p><p><strong>Incident anatomy:</strong> the Hugging Face July 2026 disclosure and coverage,<sup class="footnote-ref" id="fnref-1-6"><a href="#fn-1">1</a></sup><span class="footnote-separator">, </span><sup class="footnote-ref" id="fnref-2-4"><a href="#fn-2">2</a></sup><span class="footnote-separator">, </span><sup class="footnote-ref" id="fnref-3-3"><a href="#fn-3">3</a></sup> the React2Shell analyses,<sup class="footnote-ref" id="fnref-15-3"><a href="#fn-15">15</a></sup><span class="footnote-separator">, </span><sup class="footnote-ref" id="fnref-16-2"><a href="#fn-16">16</a></sup><span class="footnote-separator">, </span><sup class="footnote-ref" id="fnref-17-2"><a href="#fn-17">17</a></sup> and the LiteLLM supply-chain postmortem.<sup class="footnote-ref" id="fnref-18-3"><a href="#fn-18">18</a></sup><span class="footnote-separator">, </span><sup class="footnote-ref" id="fnref-19-3"><a href="#fn-19">19</a></sup></p><p><strong>Companion documents:</strong> the <strong>Portfolio Security Control Pack</strong> provides internal templates for Parts II, VII, and VIII. The Spanish-language workshop deck <em>Estación 10: Ciberseguridad: de POC funcional a pentesting asistido</em> covers the POC-to-production risk shift, OWASP taxonomies, and a Shannon demonstration for team training.</p><h2 id="c-prompt-library">C. Prompt library</h2><p>Full text in <code>exercises/prompts/</code>:</p><ul><li><code>code-audit-system.md</code>. Per-file audit system prompt (JSON schema). Lab 3</li><li><code>verification-pass.md</code>. "prove it or drop it" finding validation. Labs 3, 6</li><li><code>ir-copilot.md</code>. Incident-response copilot with timeline discipline. Lab 7</li><li><code>AGENTS-security-template.md</code>. Security invariants + approval boundaries for coding agents. §2.5, §5.6</li></ul><h2 id="d-claims-ledger">D. Claims ledger</h2><p>Every load-bearing factual claim in this document, its status, and where it comes from. Statuses: <strong>Primary</strong> (first-party disclosure/documentation), <strong>Independent</strong> (third-party benchmark or government evaluation), <strong>Vendor</strong> (vendor-reported figures; treat as directional), <strong>Press</strong> (news reporting), <strong>Internal</strong> (our own measurements). Re-check Vendor/Press claims before quoting them externally.</p><table><thead><tr><th>#</th><th>Claim</th><th>Status</th><th>Source</th></tr></thead><tbody><tr><td>1</td><td>Hugging Face disclosed a production breach in July 2026; detected and contained</td><td>Primary/Press</td><td><sup class="footnote-ref" id="fnref-1-7"><a href="#fn-1">1</a></sup><span class="footnote-separator">, </span><sup class="footnote-ref" id="fnref-2-5"><a href="#fn-2">2</a></sup><span class="footnote-separator">, </span><sup class="footnote-ref" id="fnref-3-4"><a href="#fn-3">3</a></sup></td></tr><tr><td>2</td><td>The intruder was OpenAI evaluation models (incl. GPT-5.6 Sol), refs reduced, pursuing an exploit-benchmark objective; chain included a package-registry proxy zero-day and RCE on HF servers</td><td>Vendor (first-party for own role)</td><td><sup class="footnote-ref" id="fnref-42-3"><a href="#fn-42">42</a></sup></td></tr><tr><td>3</td><td>Scale of 17,000+ autonomous actions</td><td>Press</td><td><sup class="footnote-ref" id="fnref-1-8"><a href="#fn-1">1</a></sup><span class="footnote-separator">, </span><sup class="footnote-ref" id="fnref-2-6"><a href="#fn-2">2</a></sup></td></tr><tr><td>4</td><td>HF used an open-source model for containment/forensics; guardrail friction in commercial-model forensics</td><td>Vendor/Press</td><td><sup class="footnote-ref" id="fnref-42-4"><a href="#fn-42">42</a></sup><span class="footnote-separator">, </span><sup class="footnote-ref" id="fnref-1-9"><a href="#fn-1">1</a></sup></td></tr><tr><td>5</td><td>Fastest access→exfiltration 72 min; identity in ~90% of cases; SaaS in 23%</td><td>Vendor (Unit 42)</td><td><sup class="footnote-ref" id="fnref-4-4"><a href="#fn-4">4</a></sup></td></tr><tr><td>6</td><td>Fastest eCrime breakout 27 seconds</td><td>Vendor (CrowdStrike)</td><td><sup class="footnote-ref" id="fnref-4-5"><a href="#fn-4">4</a></sup></td></tr><tr><td>7</td><td>GPT-5.5: 71.4% Expert-tier cyber suite; "The Last Ones" completed 2/10</td><td>Independent (UK AISI)</td><td><sup class="footnote-ref" id="fnref-5"><a href="#fn-5">5</a></sup></td></tr><tr><td>8</td><td>Open-weight cyber gap ≈4–7 months (GLM-5.2); run costs $85/$46/$1.19 per 100M tokens</td><td>Independent (UK AISI)</td><td><sup class="footnote-ref" id="fnref-43-2"><a href="#fn-43">43</a></sup></td></tr><tr><td>9</td><td>K3: 57.1 Intelligence Index (4th/189), 1,048,576-token context, and Fireworks pricing of $3.00/M input, $0.30/M cached input, and $15.00/M output.</td><td>Independent (Artificial Analysis) + Vendor</td><td><sup class="footnote-ref" id="fnref-23-18"><a href="#fn-23">23</a></sup></td></tr><tr><td>10</td><td>K3 security scanning: F1 ≈0.34–0.40 harness-dependent; precision 0.684; ~6% F1 on largest repo</td><td>Independent (Semgrep)</td><td><sup class="footnote-ref" id="fnref-44-5"><a href="#fn-44">44</a></sup></td></tr><tr><td>11</td><td>K3+Fable routing: 93% over ~1,030 agentic tasks; K3 wins terminal/security tasks</td><td>Vendor (Fireworks)</td><td><sup class="footnote-ref" id="fnref-45-2"><a href="#fn-45">45</a></sup></td></tr><tr><td>12</td><td>Repeated cheap-model runs ≈ single flagship run on CVE reproduction</td><td>Vendor benchmark (Aikido)</td><td><sup class="footnote-ref" id="fnref-48-2"><a href="#fn-48">48</a></sup></td></tr><tr><td>13</td><td>Shannon: 96.15% XBOW benchmark; ~1–1.5 h, ~$50 per run</td><td>Vendor</td><td><sup class="footnote-ref" id="fnref-26-11"><a href="#fn-26">26</a></sup><span class="footnote-separator">, </span><sup class="footnote-ref" id="fnref-27-6"><a href="#fn-27">27</a></sup></td></tr><tr><td>14</td><td>Shannon 2.0 runs on the Pi harness; K3 backend via Pi provider config</td><td>Vendor + <strong>Experimental</strong></td><td><sup class="footnote-ref" id="fnref-47-3"><a href="#fn-47">47</a></sup></td></tr><tr><td>15</td><td>Strix → K3 via LiteLLM/OpenAI-compatible env config</td><td>Vendor docs; examples use <code>accounts/fireworks/models/kimi-k3</code></td><td><sup class="footnote-ref" id="fnref-29-9"><a href="#fn-29">29</a></sup></td></tr><tr><td>16</td><td>K3 API behaviors documented by Moonshot (reasoning_effort, strict JSON Schema, prefix caching, preserved assistant messages); Fireworks behavior must be verified from Fireworks or the live endpoint before quoting as Fireworks functionality</td><td>Primary (Moonshot docs); Fireworks verification pending</td><td><sup class="footnote-ref" id="fnref-46-6"><a href="#fn-46">46</a></sup></td></tr><tr><td>17</td><td>Fireworks configuration: <code>accounts/fireworks/models/kimi-k3</code>, 1,048,576-token context, $3.00/M input, $0.30/M cached input, and $15.00/M output</td><td>Internal</td><td>this pack</td></tr><tr><td>18</td><td>The exercise pack includes two local training apps with planted vulnerability classes, deterministic dry-run modes, and expected-output notes for calibration.</td><td>Internal</td><td>this pack</td></tr><tr><td>19</td><td>The adapter accumulates token usage and cost where the provider exposes usage fields; built-in prices remain env-overridable.</td><td>Internal</td><td>this pack</td></tr><tr><td>20</td><td><code>repo_index.py</code>/<code>path_audit.py</code> use Tree-sitter parsing for Python, JavaScript, and TypeScript/TSX, with deterministic path bundles, fresh-context verification, root-cause clustering, and dynamic-verification hand-off.</td><td>Internal</td><td>this pack</td></tr><tr><td>21</td><td><code>path_agent.py</code> is a minimal read-only tool-calling loop with sandboxed file access, bounded rounds, and complete assistant-message preservation where the endpoint supports it.</td><td>Internal</td><td>this pack</td></tr><tr><td>22</td><td>July 24, 2026 open letter "Open Weights and American AI Leadership" urges policymakers to avoid premature restrictions on open models; signatories include NVIDIA, Microsoft, Meta, Mistral, Hugging Face, CrowdStrike, and Fireworks AI, with OpenAI signing after launch; its cyber passage: defenders need access to models with capabilities comparable to attackers'</td><td>Primary</td><td><sup class="footnote-ref" id="fnref-49-2"><a href="#fn-49">49</a></sup></td></tr></tbody></table><h2 id="e-glossary-for-the-non-infosec-reader">E. Glossary (for the non-infosec reader)</h2><ul><li><strong>Attack surface:</strong> everything reachable that could be abused: endpoints, ports, dependencies, people.</li><li><strong>Black-box / white-box:</strong> testing without / with source-code access.</li><li><strong>PoC (proof of concept):</strong> a demonstration that a vulnerability is real and reproducible: the currency of serious findings.</li><li><strong>Fan-out / fan-in:</strong> splitting work into many small model calls, then merging results deterministically.</li><li><strong>Guardrails:</strong> limits on what a model or agent will do. Vendor-side (refusals) or yours (scope, approvals).</li><li><strong>Least privilege / least agency:</strong> grant exactly the permissions the task needs: to users (privilege) and to AI agents (agency).</li><li><strong>RTO / RPO:</strong> how long you can be down / how much data you can lose.</li><li><strong>SIEM:</strong> central log + alert platform (Wazuh is the open-source starting point).</li><li><strong>SSRF / SSTI / IDOR:</strong> server-side request forgery / server-side template injection / insecure direct object reference. Three web vuln classes the labs make concrete.</li><li><strong>Zero trust:</strong> never trust by network location; verify identity and authorize every request.</li></ul><h2 id="f-references">F. References</h2><p><em>The AI Cybersecurity Playbook: v1.5, July 2026. Prepared by Trilogy AI Center of Excellence as a public practical resource for defensive cybersecurity with open-weight models. Public repository: <a href="https://github.com/trilogy-group/ai-cybersecurity-playbook" target="_blank" rel="noopener noreferrer">trilogy-group/ai-cybersecurity-playbook</a>. Exercise pack: <a href="https://github.com/trilogy-group/ai-cybersecurity-playbook/tree/main/exercises" target="_blank" rel="noopener noreferrer">repository source</a>. Publish the HTML through GitHub Pages from <code>docs/index.html</code>.</em></p><p><em>Revision notes (v1.5): state-based language added for the Kimi K3 public-weight release; absolute hosted-access claims replaced with provider-portability and deployment-choice language; Fireworks configuration values added for K3; evidence ladder wording corrected so static reachability tops out at E2, dynamic reproduction reaches E3, and E4 requires fix plus regression and closure checks; <code>curl | bash</code> installation examples removed; GitHub Pages publication model added.</em></p><section class="footnotes" id="sources" aria-labelledby="sources-heading">
+<h2 id="sources-heading">Sources</h2>
+<ol>
+<li id="fn-1">The Hacker News, "World's Largest AI Model Repository Hugging Face Breached by Autonomous AI Agent" (July 20, 2026). <a href="https://thehackernews.com/2026/07/worlds-largest-ai-model-repository.html" target="_blank" rel="noopener noreferrer">https://thehackernews.com/2026/07/worlds-largest-ai-model-repository.html</a> <a class="footnote-backref" href="#fnref-1" aria-label="Back to reference">Back</a></li>
+<li id="fn-2">TechCrunch, "Hugging Face confirms breach affected internal datasets and credentials" (July 20, 2026). <a href="https://techcrunch.com/2026/07/20/hugging-face-confirms-breach-affected-internal-datasets-and-credentials-urges-users-to-take-action/" target="_blank" rel="noopener noreferrer">https://techcrunch.com/2026/07/20/hugging-face-confirms-breach-affected-internal-datasets-and-credentials-urges-users-to-take-action/</a> <a class="footnote-backref" href="#fnref-2" aria-label="Back to reference">Back</a></li>
+<li id="fn-3">Hugging Face, "Security incident disclosure, July 2026" (July 17, 2026). <a href="https://huggingface.co/blog/security-incident-july-2026" target="_blank" rel="noopener noreferrer">https://huggingface.co/blog/security-incident-july-2026</a> <a class="footnote-backref" href="#fnref-3" aria-label="Back to reference">Back</a></li>
+<li id="fn-4">Lowenstein Sandler, "Frontier AI Models and Cybersecurity Readiness" (May 19, 2026), citing Unit 42 Global Incident Response Report 2026, CrowdStrike 2026 Global Threat Report, and Mandiant M-Trends 2026. <a href="https://www.lowenstein.com/news-insights/publications/articles/frontier-ai-models-and-cybersecurity-readiness-recalibrating-risk-for-a-faster-threat-environment-mushahwar-overton" target="_blank" rel="noopener noreferrer">https://www.lowenstein.com/news-insights/publications/articles/frontier-ai-models-and-cybersecurity-readiness-recalibrating-risk-for-a-faster-threat-environment-mushahwar-overton</a> <a class="footnote-backref" href="#fnref-4" aria-label="Back to reference">Back</a></li>
+<li id="fn-5">Rubrik, "Every AI Frontier Model is Now a Cyber Threat" (May 12, 2026), citing UK AISI's GPT-5.5 evaluation and the CSA/SANS/[un]prompted strategy briefing. <a href="https://www.rubrik.com/blog/technology/26/5/every-ai-frontier-model-is-now-a-cyber-threat-so-what-can-you-do-about-It" target="_blank" rel="noopener noreferrer">https://www.rubrik.com/blog/technology/26/5/every-ai-frontier-model-is-now-a-cyber-threat-so-what-can-you-do-about-It</a> <a class="footnote-backref" href="#fnref-5" aria-label="Back to reference">Back</a></li>
+<li id="fn-6">Palo Alto Networks, "Defender's Guide to the Frontier AI Impact on Cybersecurity, May 2026 Update" (May 13, 2026). <a href="https://www.paloaltonetworks.com/blog/2026/05/defenders-guide-frontier-ai-impact-cybersecurity-may-2026-update/" target="_blank" rel="noopener noreferrer">https://www.paloaltonetworks.com/blog/2026/05/defenders-guide-frontier-ai-impact-cybersecurity-may-2026-update/</a> <a class="footnote-backref" href="#fnref-6" aria-label="Back to reference">Back</a></li>
+<li id="fn-7">The Hacker News, "OpenAI Expands Daybreak With GPT-5.5-Cyber to Help Defenders Patch Security Flaws" (June 23, 2026). <a href="https://thehackernews.com/2026/06/openai-expands-daybreak-with-gpt-55.html" target="_blank" rel="noopener noreferrer">https://thehackernews.com/2026/06/openai-expands-daybreak-with-gpt-55.html</a> <a class="footnote-backref" href="#fnref-7" aria-label="Back to reference">Back</a></li>
+<li id="fn-8">TechCrunch, "Cybersecurity researchers aren't happy about the guardrails on Anthropic's Fable" (June 10, 2026). <a href="https://techcrunch.com/2026/06/10/cybersecurity-researchers-arent-happy-about-the-guardrails-on-anthropics-fable/" target="_blank" rel="noopener noreferrer">https://techcrunch.com/2026/06/10/cybersecurity-researchers-arent-happy-about-the-guardrails-on-anthropics-fable/</a> <a class="footnote-backref" href="#fnref-8" aria-label="Back to reference">Back</a></li>
+<li id="fn-9">Anthropic, "Statement on the US government directive to suspend access to Fable 5 and Mythos 5" (June 12, 2026). <a href="https://www.anthropic.com/news/fable-mythos-access" target="_blank" rel="noopener noreferrer">https://www.anthropic.com/news/fable-mythos-access</a> <a class="footnote-backref" href="#fnref-9" aria-label="Back to reference">Back</a></li>
+<li id="fn-10">IBM Think, "Anthropic launches most powerful AI model yet, with new safety guardrails" (June 9, 2026). <a href="https://www.ibm.com/think/news/anthropic-launches-powerful-ai-model-fable-5-mythos-5-safety-guardrails" target="_blank" rel="noopener noreferrer">https://www.ibm.com/think/news/anthropic-launches-powerful-ai-model-fable-5-mythos-5-safety-guardrails</a> <a class="footnote-backref" href="#fnref-10" aria-label="Back to reference">Back</a></li>
+<li id="fn-11">OWASP, "Top 10 (2025)". <a href="https://owasp.org/Top10/2025/" target="_blank" rel="noopener noreferrer">https://owasp.org/Top10/2025/</a> <a class="footnote-backref" href="#fnref-11" aria-label="Back to reference">Back</a></li>
+<li id="fn-12">OWASP GenAI Security Project, "Top 10 for LLM Applications". <a href="https://genai.owasp.org/llm-top-10/" target="_blank" rel="noopener noreferrer">https://genai.owasp.org/llm-top-10/</a> <a class="footnote-backref" href="#fnref-12" aria-label="Back to reference">Back</a></li>
+<li id="fn-13">OWASP GenAI Security Project, "Top 10 for Agentic Applications (2026)". <a href="https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/" target="_blank" rel="noopener noreferrer">https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/</a> <a class="footnote-backref" href="#fnref-13" aria-label="Back to reference">Back</a></li>
+<li id="fn-14">Cycode, "OWASP Top 10 for Agentic Applications 2026 Explained" (July 22, 2026). <a href="https://cycode.com/blog/owasp-top-10-agentic-applications/" target="_blank" rel="noopener noreferrer">https://cycode.com/blog/owasp-top-10-agentic-applications/</a> <a class="footnote-backref" href="#fnref-14" aria-label="Back to reference">Back</a></li>
+<li id="fn-15">Checkmarx, "React2Shell (CVE-2025-55182): Deserialization to RCE in React and Next.js" (December 4, 2025). <a href="https://checkmarx.com/zero-post/react2shell-cve-2025-55182-deserialization-to-remote-code-execution-in-react-and-next-js/" target="_blank" rel="noopener noreferrer">https://checkmarx.com/zero-post/react2shell-cve-2025-55182-deserialization-to-remote-code-execution-in-react-and-next-js/</a> <a class="footnote-backref" href="#fnref-15" aria-label="Back to reference">Back</a></li>
+<li id="fn-16">Datadog Security Labs, "CVE-2025-55182 (React2Shell): RCE in React Server Components and Next.js" (December 4, 2025). <a href="https://securitylabs.datadoghq.com/articles/cve-2025-55182-react2shell-remote-code-execution-react-server-components/" target="_blank" rel="noopener noreferrer">https://securitylabs.datadoghq.com/articles/cve-2025-55182-react2shell-remote-code-execution-react-server-components/</a> <a class="footnote-backref" href="#fnref-16" aria-label="Back to reference">Back</a></li>
+<li id="fn-17">Qualys, "React2Shell: Decoding CVE-2025-55182" (December 10, 2025). <a href="https://blog.qualys.com/product-tech/2025/12/10/react2shell-decoding-cve-2025-55182-the-silent-threat-in-react-server-components" target="_blank" rel="noopener noreferrer">https://blog.qualys.com/product-tech/2025/12/10/react2shell-decoding-cve-2025-55182-the-silent-threat-in-react-server-components</a> <a class="footnote-backref" href="#fnref-17" aria-label="Back to reference">Back</a></li>
+<li id="fn-18">LiteLLM GitHub Issue #24512, supply-chain compromise report. <a href="https://github.com/BerriAI/litellm/issues/24512" target="_blank" rel="noopener noreferrer">https://github.com/BerriAI/litellm/issues/24512</a> <a class="footnote-backref" href="#fnref-18" aria-label="Back to reference">Back</a></li>
+<li id="fn-19">Snyk, "Poisoned Security Scanner Backdooring LiteLLM". <a href="https://snyk.io/articles/poisoned-security-scanner-backdooring-litellm/" target="_blank" rel="noopener noreferrer">https://snyk.io/articles/poisoned-security-scanner-backdooring-litellm/</a> <a class="footnote-backref" href="#fnref-19" aria-label="Back to reference">Back</a></li>
+<li id="fn-20">MITRE ATT&amp;CK. <a href="https://attack.mitre.org/" target="_blank" rel="noopener noreferrer">https://attack.mitre.org/</a> <a class="footnote-backref" href="#fnref-20" aria-label="Back to reference">Back</a></li>
+<li id="fn-21">NIST SP 800-207, "Zero Trust Architecture". <a href="https://csrc.nist.gov/pubs/sp/800/207/final" target="_blank" rel="noopener noreferrer">https://csrc.nist.gov/pubs/sp/800/207/final</a> <a class="footnote-backref" href="#fnref-21" aria-label="Back to reference">Back</a></li>
+<li id="fn-22">Lockheed Martin, "Cyber Kill Chain". <a href="https://www.lockheedmartin.com/en-us/capabilities/cyber/cyber-kill-chain.html" target="_blank" rel="noopener noreferrer">https://www.lockheedmartin.com/en-us/capabilities/cyber/cyber-kill-chain.html</a> <a class="footnote-backref" href="#fnref-22" aria-label="Back to reference">Back</a></li>
+<li id="fn-23">Trilogy AI, "Kimi K3 Is Live: Pricing, Benchmarks, and the Wait for Public Weights" (July 18, 2026). <a href="https://trilogyai.substack.com/p/kimi-k3-is-live-pricing-benchmarks" target="_blank" rel="noopener noreferrer">https://trilogyai.substack.com/p/kimi-k3-is-live-pricing-benchmarks</a> <a class="footnote-backref" href="#fnref-23-4" aria-label="Back to reference">Back</a></li>
+<li id="fn-24">Fireworks AI Kimi K3 model page. <a href="https://app.fireworks.ai/models/fireworks/kimi-k3" target="_blank" rel="noopener noreferrer">https://app.fireworks.ai/models/fireworks/kimi-k3</a> <a class="footnote-backref" href="#fnref-24" aria-label="Back to reference">Back</a></li>
+<li id="fn-25">Data Science Dojo, "Hugging Face Security Breach 2026: The AI Agent Attack Explained" (July 22, 2026), including Sysdig's JADEPUFFER agentic-ransomware tracking. <a href="https://datasciencedojo.com/blog/hugging-face-security-breach-2026/" target="_blank" rel="noopener noreferrer">https://datasciencedojo.com/blog/hugging-face-security-breach-2026/</a> <a class="footnote-backref" href="#fnref-25" aria-label="Back to reference">Back</a></li>
+<li id="fn-26">KeygraphHQ, Shannon (autonomous white-box AI pentester). <a href="https://github.com/KeygraphHQ/shannon" target="_blank" rel="noopener noreferrer">https://github.com/KeygraphHQ/shannon</a> <a class="footnote-backref" href="#fnref-26" aria-label="Back to reference">Back</a></li>
+<li id="fn-27">unicodeveloper, "Shannon Skill for Claude Code" (XBOW benchmark, runtime/cost figures). <a href="https://github.com/unicodeveloper/shannon" target="_blank" rel="noopener noreferrer">https://github.com/unicodeveloper/shannon</a> <a class="footnote-backref" href="#fnref-27" aria-label="Back to reference">Back</a></li>
+<li id="fn-28">Better Stack, "AI Penetration Testing with Shannon" (March 2026). <a href="https://betterstack.com/community/guides/ai/shannon-ai/" target="_blank" rel="noopener noreferrer">https://betterstack.com/community/guides/ai/shannon-ai/</a> <a class="footnote-backref" href="#fnref-28" aria-label="Back to reference">Back</a></li>
+<li id="fn-29">Strix, open-source AI penetration testing agents. <a href="https://github.com/usestrix/strix" target="_blank" rel="noopener noreferrer">https://github.com/usestrix/strix</a> <a class="footnote-backref" href="#fnref-29" aria-label="Back to reference">Back</a></li>
+<li id="fn-30">Help Net Security, "Strix: Open-source AI agents for penetration testing" (November 17, 2025). <a href="https://www.helpnetsecurity.com/2025/11/17/strix-open-source-ai-agents-penetration-testing/" target="_blank" rel="noopener noreferrer">https://www.helpnetsecurity.com/2025/11/17/strix-open-source-ai-agents-penetration-testing/</a> <a class="footnote-backref" href="#fnref-30" aria-label="Back to reference">Back</a></li>
+<li id="fn-31">Pensar, Apex, AI-powered pentesting CLI. <a href="https://github.com/pensarai/apex" target="_blank" rel="noopener noreferrer">https://github.com/pensarai/apex</a> <a class="footnote-backref" href="#fnref-31" aria-label="Back to reference">Back</a></li>
+<li id="fn-32">Pensar Apex Documentation, "Whitebox Testing". <a href="https://pensarai-apex.mintlify.app/guides/whitebox-testing" target="_blank" rel="noopener noreferrer">https://pensarai-apex.mintlify.app/guides/whitebox-testing</a> <a class="footnote-backref" href="#fnref-32" aria-label="Back to reference">Back</a></li>
+<li id="fn-33">OpenHands, "The OpenHands Vulnerability Fixer" (March 3, 2026). <a href="https://openhands.dev/blog/20260303-vulnerability-fixer" target="_blank" rel="noopener noreferrer">https://openhands.dev/blog/20260303-vulnerability-fixer</a>; repository: <a href="https://github.com/OpenHands/vulnerability-fixer" target="_blank" rel="noopener noreferrer">https://github.com/OpenHands/vulnerability-fixer</a> <a class="footnote-backref" href="#fnref-33" aria-label="Back to reference">Back</a></li>
+<li id="fn-34">OpenAI, "Daybreak: Frontier AI for defenders". <a href="https://openai.com/daybreak/" target="_blank" rel="noopener noreferrer">https://openai.com/daybreak/</a> <a class="footnote-backref" href="#fnref-34" aria-label="Back to reference">Back</a></li>
+<li id="fn-35">OpenAI Help Center, "OpenAI Daybreak: Trusted Access for Cyber Overview". <a href="https://help.openai.com/en/articles/20001258-openai-daybreak-trusted-access-for-cyber-overview" target="_blank" rel="noopener noreferrer">https://help.openai.com/en/articles/20001258-openai-daybreak-trusted-access-for-cyber-overview</a> <a class="footnote-backref" href="#fnref-35" aria-label="Back to reference">Back</a></li>
+<li id="fn-36">SiliconANGLE, "OpenAI expands Daybreak with Patch the Planet and full GPT-5.5-Cyber release" (June 22, 2026). <a href="https://siliconangle.com/2026/06/22/openai-expands-daybreak-patch-planet-full-gpt-5-5-cyber-release/" target="_blank" rel="noopener noreferrer">https://siliconangle.com/2026/06/22/openai-expands-daybreak-patch-planet-full-gpt-5-5-cyber-release/</a> <a class="footnote-backref" href="#fnref-36" aria-label="Back to reference">Back</a></li>
+<li id="fn-37">Jock's Thoughts, "Claude Code vs Codex vs Aider vs OpenCode vs Pi (2026)" (April 15, 2026); harness-effect and context-decay findings. <a href="https://thoughts.jock.pl/p/ai-coding-harness-agents-2026" target="_blank" rel="noopener noreferrer">https://thoughts.jock.pl/p/ai-coding-harness-agents-2026</a> <a class="footnote-backref" href="#fnref-37" aria-label="Back to reference">Back</a></li>
+<li id="fn-38">Jonathan's Musings, "Inside the Agent Harness: How Codex and Claude Code Actually Work" (April 22, 2026). <a href="https://medium.com/jonathans-musings/inside-the-agent-harness-how-codex-and-claude-code-actually-work-63593e26c176" target="_blank" rel="noopener noreferrer">https://medium.com/jonathans-musings/inside-the-agent-harness-how-codex-and-claude-code-actually-work-63593e26c176</a> <a class="footnote-backref" href="#fnref-38" aria-label="Back to reference">Back</a></li>
+<li id="fn-39">Simon Willison, "Use subagents and custom agents in Codex" (March 16, 2026). <a href="https://simonwillison.net/2026/Mar/16/codex-subagents/" target="_blank" rel="noopener noreferrer">https://simonwillison.net/2026/Mar/16/codex-subagents/</a> <a class="footnote-backref" href="#fnref-39" aria-label="Back to reference">Back</a></li>
+<li id="fn-40">Morph, "Best AI Coding Agent (2026)"; OpenCode adoption and Terminal-Bench figures. <a href="https://morphllm.com/ai-coding-agent" target="_blank" rel="noopener noreferrer">https://morphllm.com/ai-coding-agent</a> <a class="footnote-backref" href="#fnref-40" aria-label="Back to reference">Back</a></li>
+<li id="fn-41">Rising Trends, "10 AI Agent Trends to Watch in 2026" (March 30, 2026); multi-agent orchestration and LangGraph. <a href="https://www.risingtrends.co/blog/ai-agents-trends-2026" target="_blank" rel="noopener noreferrer">https://www.risingtrends.co/blog/ai-agents-trends-2026</a> <a class="footnote-backref" href="#fnref-41" aria-label="Back to reference">Back</a></li>
+<li id="fn-42">OpenAI, "Partnering with Hugging Face to respond to a security incident during model evaluations" (July 2026). <a href="https://openai.com/index/hugging-face-model-evaluation-security-incident/" target="_blank" rel="noopener noreferrer">https://openai.com/index/hugging-face-model-evaluation-security-incident/</a> <a class="footnote-backref" href="#fnref-42" aria-label="Back to reference">Back</a></li>
+<li id="fn-43">UK AI Security Institute, "How far behind the frontier are leading open-weight models on cyber?" (July 18, 2026). <a href="https://www.aisi.gov.uk/blog/how-far-behind-the-frontier-are-leading-open-weight-models-on-cyber" target="_blank" rel="noopener noreferrer">https://www.aisi.gov.uk/blog/how-far-behind-the-frontier-are-leading-open-weight-models-on-cyber</a> <a class="footnote-backref" href="#fnref-43" aria-label="Back to reference">Back</a></li>
+<li id="fn-44">Semgrep, "Kimi K3 Benchmarks: Strong on Paper, Weak on Precision" (2026). <a href="https://semgrep.dev/blog/2026/kimi-k3s-code-security-results-lack-precision" target="_blank" rel="noopener noreferrer">https://semgrep.dev/blog/2026/kimi-k3s-code-security-results-lack-precision</a> <a class="footnote-backref" href="#fnref-44" aria-label="Back to reference">Back</a></li>
+<li id="fn-45">Fireworks AI, "Kimi K3 is competitive with Fable; Kimi K3 + Fable is SoTA on Agentic Work" (2026). <a href="https://fireworks.ai/blog/kimik3-fable" target="_blank" rel="noopener noreferrer">https://fireworks.ai/blog/kimik3-fable</a> <a class="footnote-backref" href="#fnref-45" aria-label="Back to reference">Back</a></li>
+<li id="fn-46">Moonshot AI, "Kimi K3 Quickstart" (platform documentation). <a href="https://platform.moonshot.ai/docs/guide/kimi-k3-quickstart" target="_blank" rel="noopener noreferrer">https://platform.moonshot.ai/docs/guide/kimi-k3-quickstart</a> <a class="footnote-backref" href="#fnref-46" aria-label="Back to reference">Back</a></li>
+<li id="fn-47">KeygraphHQ, Shannon repository discussions: authentication improvements and the migration to the Pi harness. <a href="https://github.com/KeygraphHQ/shannon/discussions/393" target="_blank" rel="noopener noreferrer">https://github.com/KeygraphHQ/shannon/discussions/393</a> <a class="footnote-backref" href="#fnref-47" aria-label="Back to reference">Back</a></li>
+<li id="fn-48">Aikido Security, "Finding Real Vulnerabilities (Versus CVEs) with AI: Model Evaluation" (2026). <a href="https://www.aikido.dev/blog/finding-real-vulnerabilities-versus-cves-ai-model-evaluation" target="_blank" rel="noopener noreferrer">https://www.aikido.dev/blog/finding-real-vulnerabilities-versus-cves-ai-model-evaluation</a> <a class="footnote-backref" href="#fnref-48" aria-label="Back to reference">Back</a></li>
+<li id="fn-49">"Open Weights and American AI Leadership" (open letter, July 24, 2026). <a href="https://images.nvidia.com/pdf/Open-Weights-and-American-AI-Leadership.pdf" target="_blank" rel="noopener noreferrer">https://images.nvidia.com/pdf/Open-Weights-and-American-AI-Leadership.pdf</a> (also hosted at <a href="https://www.microsoft.com/en-us/corporate-responsibility/topics/open-weight/" target="_blank" rel="noopener noreferrer">https://www.microsoft.com/en-us/corporate-responsibility/topics/open-weight/</a> <a class="footnote-backref" href="#fnref-49" aria-label="Back to reference">Back</a></li>
+</ol>
+</section>
+    </article>
+</main>
+</div>
+
+<script>
+
+(() => {
+  const nav = document.querySelector('.sidebar nav');
+  const article = document.querySelector('.article');
+  if (!nav || !article || nav.dataset.grouped === 'true') return;
+
+  const originalLinks = Array.from(nav.querySelectorAll('.nav-link[href^="#"]'));
+  const partHeadings = Array.from(article.querySelectorAll('h1')).filter((heading) => {
+    const label = heading.textContent.trim();
+    return /^Part\s+[IVX]+\b/.test(label) || label === 'Appendices';
+  });
+  if (!partHeadings.length) return;
+
+  const linksByPart = new Map(partHeadings.map((heading) => [heading, []]));
+  const overviewLinks = [];
+  const findPart = (target) => {
+    let part = null;
+    for (const heading of partHeadings) {
+      if (heading === target || heading.compareDocumentPosition(target) & Node.DOCUMENT_POSITION_FOLLOWING) {
+        part = heading;
+      } else {
+        break;
+      }
+    }
+    return part;
+  };
+
+  originalLinks.forEach((link) => {
+    const target = document.getElementById(link.hash.slice(1));
+    const part = target ? findPart(target) : null;
+    (part ? linksByPart.get(part) : overviewLinks).push(link);
+  });
+
+  const groups = [];
+  const fragment = document.createDocumentFragment();
+  if (overviewLinks.length) {
+    const overview = document.createElement('div');
+    overview.className = 'toc-overview';
+    overview.append(...overviewLinks);
+    fragment.append(overview);
+  }
+
+  const setOpen = (group, open) => {
+    const toggle = group.querySelector('.toc-part__toggle');
+    const sections = group.querySelector('.toc-part__sections');
+    if (!toggle || !sections) return;
+    toggle.setAttribute('aria-expanded', String(open));
+    toggle.setAttribute('aria-label', `${open ? 'Collapse' : 'Expand'} ${group.dataset.label}`);
+    sections.hidden = !open;
+  };
+
+  partHeadings.forEach((heading) => {
+    const group = document.createElement('div');
+    const header = document.createElement('div');
+    const partLink = document.createElement('a');
+    const sectionLinks = linksByPart.get(heading);
+    group.className = 'toc-part';
+    group.dataset.partId = heading.id;
+    group.dataset.label = heading.textContent.trim();
+    header.className = 'toc-part__header';
+    partLink.className = 'toc-part__link';
+    partLink.href = `#${heading.id}`;
+    partLink.textContent = group.dataset.label;
+    header.append(partLink);
+
+    if (sectionLinks.length) {
+      const toggle = document.createElement('button');
+      const sections = document.createElement('div');
+      toggle.className = 'toc-part__toggle';
+      toggle.type = 'button';
+      toggle.innerHTML = '<span aria-hidden="true">›</span>';
+      sections.className = 'toc-part__sections';
+      sections.id = `toc-${heading.id}-sections`;
+      sections.append(...sectionLinks);
+      toggle.setAttribute('aria-controls', sections.id);
+      toggle.addEventListener('click', () => {
+        group.dataset.userControlled = 'true';
+        setOpen(group, toggle.getAttribute('aria-expanded') !== 'true');
+      });
+      header.append(toggle);
+      group.append(header, sections);
+      setOpen(group, false);
+    } else {
+      header.style.gridTemplateColumns = '1fr';
+      group.append(header);
+    }
+
+    groups.push(group);
+    fragment.append(group);
+  });
+
+  nav.replaceChildren(fragment);
+  nav.dataset.grouped = 'true';
+
+  const tracked = Array.from(nav.querySelectorAll('a[href^="#"]'))
+    .map((link) => ({
+      link,
+      target: document.getElementById(link.hash.slice(1)),
+      group: link.closest('.toc-part'),
+    }))
+    .filter((item) => item.target)
+    .sort((a, b) => a.target.compareDocumentPosition(b.target) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1);
+
+  let scheduled = false;
+  let activeId = '';
+  const update = () => {
+    scheduled = false;
+    const threshold = Math.min(180, window.innerHeight * 0.3);
+    let active = tracked[0];
+    for (const item of tracked) {
+      if (item.target.getBoundingClientRect().top <= threshold) active = item;
+      else break;
+    }
+    if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2) {
+      active = tracked[tracked.length - 1];
+    }
+    if (!active) return;
+
+    tracked.forEach((item) => {
+      const isActive = item === active;
+      item.link.classList.toggle('is-active', isActive);
+      if (isActive) item.link.setAttribute('aria-current', 'location');
+      else item.link.removeAttribute('aria-current');
+    });
+
+    groups.forEach((group) => {
+      const isCurrent = group === active.group;
+      group.classList.toggle('is-current', isCurrent);
+      if (group.dataset.userControlled !== 'true') setOpen(group, isCurrent);
+    });
+
+    if (activeId !== active.target.id) {
+      activeId = active.target.id;
+      if (window.matchMedia('(min-width: 1181px)').matches) {
+        active.link.scrollIntoView({ block: 'nearest' });
+      }
+    }
+  };
+  const schedule = () => {
+    if (scheduled) return;
+    scheduled = true;
+    requestAnimationFrame(update);
+  };
+
+  window.addEventListener('scroll', schedule, { passive: true });
+  window.addEventListener('resize', schedule);
+  window.addEventListener('hashchange', schedule);
+  update();
+})();
+
+
+(() => {
+  const figures = Array.from(document.querySelectorAll('.mermaid-figure'));
+  if (!figures.length) return;
+
+  const modal = document.createElement('div');
+  modal.className = 'diagram-modal';
+  modal.hidden = true;
+  modal.innerHTML =
+    '<div class="diagram-modal__bar">' +
+      '<div>' +
+        '<p class="diagram-modal__title"></p>' +
+        '<div class="diagram-modal__hint">Fit view by default. Use zoom to inspect details. Press Esc to close.</div>' +
+      '</div>' +
+      '<div class="diagram-modal__actions" aria-label="Diagram controls">' +
+        '<button class="diagram-modal__control" type="button" data-diagram-fit>Fit</button>' +
+        '<button class="diagram-modal__control" type="button" data-diagram-zoom-out aria-label="Zoom out">-</button>' +
+        '<span class="diagram-modal__zoom" aria-live="polite">Fit</span>' +
+        '<button class="diagram-modal__control" type="button" data-diagram-zoom-in aria-label="Zoom in">+</button>' +
+        '<button class="diagram-modal__close" type="button">Close</button>' +
+      '</div>' +
+    '</div>' +
+    '<div class="diagram-modal__viewport" tabindex="0">' +
+      '<div class="diagram-modal__canvas"></div>' +
+    '</div>';
+  document.body.appendChild(modal);
+
+  const modalTitle = modal.querySelector('.diagram-modal__title');
+  const modalViewport = modal.querySelector('.diagram-modal__viewport');
+  const modalCanvas = modal.querySelector('.diagram-modal__canvas');
+  const closeButton = modal.querySelector('.diagram-modal__close');
+  const fitButton = modal.querySelector('[data-diagram-fit]');
+  const zoomOutButton = modal.querySelector('[data-diagram-zoom-out]');
+  const zoomInButton = modal.querySelector('[data-diagram-zoom-in]');
+  const zoomLabel = modal.querySelector('.diagram-modal__zoom');
+  let activeSvg = null;
+  let activeViewBox = { width: 2200, height: 1000 };
+  let activeZoom = 1;
+  let fitZoom = 1;
+
+  const parseViewBox = (svg) => {
+    const viewBox = svg.getAttribute('viewBox') || svg.getAttribute('viewbox') || '';
+    const parts = viewBox.trim().split(/\s+/).map(Number);
+    return {
+      width: Number.isFinite(parts[2]) ? parts[2] : 2200,
+      height: Number.isFinite(parts[3]) ? parts[3] : 1000,
+    };
+  };
+
+  const centerModalViewport = (preserveRatio = false) => {
+    const leftRatio = preserveRatio && modalViewport.scrollWidth > modalViewport.clientWidth
+      ? (modalViewport.scrollLeft + modalViewport.clientWidth / 2) / modalViewport.scrollWidth
+      : 0.5;
+    const topRatio = preserveRatio && modalViewport.scrollHeight > modalViewport.clientHeight
+      ? (modalViewport.scrollTop + modalViewport.clientHeight / 2) / modalViewport.scrollHeight
+      : 0;
+
+    requestAnimationFrame(() => {
+      modalViewport.scrollLeft = Math.max(0, modalViewport.scrollWidth * leftRatio - modalViewport.clientWidth / 2);
+      modalViewport.scrollTop = Math.max(0, modalViewport.scrollHeight * topRatio - modalViewport.clientHeight / 2);
+      modalViewport.focus({ preventScroll: true });
+    });
+  };
+
+  const applyZoom = (nextZoom, options = {}) => {
+    if (!activeSvg) return;
+    const zoom = Math.max(fitZoom, Math.min(nextZoom, 2.5));
+    activeZoom = zoom;
+    activeSvg.style.width = Math.round(activeViewBox.width * zoom) + 'px';
+    activeSvg.style.height = 'auto';
+    modal.classList.toggle('is-fit', Math.abs(zoom - fitZoom) < 0.01);
+    modal.classList.toggle('is-zoomed', zoom > fitZoom + 0.01);
+    zoomLabel.textContent = Math.abs(zoom - fitZoom) < 0.01 ? 'Fit' : Math.round(zoom * 100) + '%';
+    centerModalViewport(options.preserveRatio);
+  };
+
+  const fitDiagram = () => {
+    if (!activeSvg) return;
+    const availableWidth = Math.max(320, modalViewport.clientWidth - 36);
+    const availableHeight = Math.max(260, modalViewport.clientHeight - 36);
+    fitZoom = Math.min(availableWidth / activeViewBox.width, availableHeight / activeViewBox.height, 1);
+    applyZoom(fitZoom);
+  };
+
+  const openDiagram = (figure) => {
+    const svg = figure.querySelector('svg');
+    if (!svg) return;
+    const caption = figure.querySelector('figcaption')?.textContent?.trim() || 'Diagram';
+    const clone = svg.cloneNode(true);
+    activeViewBox = parseViewBox(svg);
+    activeSvg = clone;
+    clone.removeAttribute('width');
+    clone.removeAttribute('height');
+    clone.style.width = Math.round(activeViewBox.width) + 'px';
+    clone.style.maxWidth = 'none';
+    clone.style.height = 'auto';
+    modalTitle.textContent = caption;
+    modalCanvas.replaceChildren(clone);
+    modal.hidden = false;
+    modal.classList.add('is-fit');
+    modal.classList.remove('is-zoomed');
+    document.body.classList.add('modal-open');
+    fitButton.focus({ preventScroll: true });
+    requestAnimationFrame(fitDiagram);
+  };
+
+  const closeDiagram = () => {
+    modal.hidden = true;
+    modalCanvas.replaceChildren();
+    activeSvg = null;
+    document.body.classList.remove('modal-open');
+  };
+
+  figures.forEach((figure) => {
+    const button = document.createElement('button');
+    button.className = 'diagram-zoom-button';
+    button.type = 'button';
+    button.title = 'Open diagram';
+    button.setAttribute('aria-label', 'Open diagram');
+    button.innerHTML = '<span class="visually-hidden">Open diagram</span>';
+    figure.appendChild(button);
+
+    button.addEventListener('click', (event) => {
+      event.stopPropagation();
+      openDiagram(figure);
+    });
+    figure.querySelector('.mermaid-viewport')?.addEventListener('click', () => openDiagram(figure));
+  });
+
+  closeButton.addEventListener('click', closeDiagram);
+  fitButton.addEventListener('click', fitDiagram);
+  zoomOutButton.addEventListener('click', () => applyZoom(activeZoom / 1.25, { preserveRatio: true }));
+  zoomInButton.addEventListener('click', () => applyZoom(activeZoom * 1.25, { preserveRatio: true }));
+  window.addEventListener('resize', () => {
+    if (!modal.hidden) fitDiagram();
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && !modal.hidden) closeDiagram();
+  });
+})();
+
+
+</script>
+</body>
+</html>

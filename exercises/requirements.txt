@@ -1,0 +1,12 @@
+# The exercise scripts keep dependencies minimal and pinned (see the
+# playbook's supply-chain chapter: pin everything).
+requests==2.32.3
+
+# Structural code analysis for repo_index.py / path_audit.py (Lab 8).
+# Tree-sitter is the standard incremental parser library for multi-language
+# code intelligence; grammars loaded: Python, JavaScript, TypeScript/TSX.
+# If these are missing, Python files fall back to the stdlib ast module.
+tree-sitter==0.26.0
+tree-sitter-python==0.25.0
+tree-sitter-javascript==0.25.0
+tree-sitter-typescript==0.23.2

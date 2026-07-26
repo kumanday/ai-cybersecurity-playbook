@@ -1,0 +1,96 @@
+{
+  "coverage": {
+    "entry_points_total": 5,
+    "entry_points_bundled": 5,
+    "functions_total": 7,
+    "functions_in_bundles": 7,
+    "functions_not_covered": [],
+    "bundles_dropped_budget": []
+  },
+  "bundles": [
+    {
+      "bundle_id": "entry:server.handler_get_ping",
+      "kind": "entry",
+      "label": "/ping (http-route)",
+      "entry_point": "/ping server.handler_get_ping",
+      "members": [
+        "server.handler_get_ping"
+      ],
+      "trimmed": false,
+      "sinks": [
+        "Possible JS code/command injection"
+      ],
+      "chars": 248
+    },
+    {
+      "bundle_id": "entry:server.handler_get_users",
+      "kind": "entry",
+      "label": "/users (http-route)",
+      "entry_point": "/users server.handler_get_users",
+      "members": [
+        "server.handler_get_users",
+        "db.findUsers",
+        "db.getConn"
+      ],
+      "trimmed": false,
+      "sinks": [
+        "Possible SQL injection via string formatting"
+      ],
+      "chars": 690
+    },
+    {
+      "bundle_id": "entry:server.handler_post_config",
+      "kind": "entry",
+      "label": "/config (http-route)",
+      "entry_point": "/config server.handler_post_config",
+      "members": [
+        "server.handler_post_config"
+      ],
+      "trimmed": false,
+      "sinks": [
+        "Possible JS code/command injection"
+      ],
+      "chars": 242
+    },
+    {
+      "bundle_id": "module:server.js",
+      "kind": "module-level",
+      "label": "module-level statements (server.js)",
+      "entry_point": "module import / startup (server.js)",
+      "members": [
+        "server.js"
+      ],
+      "trimmed": false,
+      "sinks": [
+        "Hardcoded secret",
+        "Possible JS code/command injection",
+        "Possible path traversal"
+      ],
+      "chars": 1630
+    },
+    {
+      "bundle_id": "entry:server.handler_get_download",
+      "kind": "entry",
+      "label": "/download (http-route)",
+      "entry_point": "/download server.handler_get_download",
+      "members": [
+        "server.handler_get_download"
+      ],
+      "trimmed": false,
+      "sinks": [],
+      "chars": 262
+    },
+    {
+      "bundle_id": "entry:server.handler_get_root",
+      "kind": "entry",
+      "label": "/ (http-route)",
+      "entry_point": "/ server.handler_get_root",
+      "members": [
+        "server.handler_get_root"
+      ],
+      "trimmed": false,
+      "sinks": [],
+      "chars": 178
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "in_scope_files": [
+    "app.py"
+  ],
+  "audited_files": [
+    "app.py"
+  ],
+  "chunks_per_file": {
+    "app.py": 1
+  },
+  "skipped": [
+    {
+      "file": "__pycache__/",
+      "reason": "excluded directory"
+    }
+  ]
+}

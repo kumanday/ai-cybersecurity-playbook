@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE nmaprun>
+<!-- Synthetic training scan for Lab 4. NOT a real network. -->
+<nmaprun scanner="nmap" args="nmap -sV -oX nmap-sample.xml 192.0.2.0/29" start="1784900000" version="7.95">
+  <host>
+    <address addr="192.0.2.10" addrtype="ipv4"/>
+    <hostnames><hostname name="web-01.example.internal" type="PTR"/></hostnames>
+    <ports>
+      <port protocol="tcp" portid="22"><state state="open"/><service name="ssh" product="OpenSSH" version="7.4" extrainfo="protocol 2.0"/></port>
+      <port protocol="tcp" portid="80"><state state="open"/><service name="http" product="Apache httpd" version="2.4.49"/></port>
+      <port protocol="tcp" portid="443"><state state="open"/><service name="https" product="Apache httpd" version="2.4.49"/></port>
+      <port protocol="tcp" portid="8080"><state state="open"/><service name="http-proxy" product="Jetty" version="9.4.44"/></port>
+    </ports>
+  </host>
+  <host>
+    <address addr="192.0.2.11" addrtype="ipv4"/>
+    <hostnames><hostname name="db-01.example.internal" type="PTR"/></hostnames>
+    <ports>
+      <port protocol="tcp" portid="22"><state state="open"/><service name="ssh" product="OpenSSH" version="8.9p1"/></port>
+      <port protocol="tcp" portid="27017"><state state="open"/><service name="mongodb" product="MongoDB" version="5.0.14"/></port>
+      <port protocol="tcp" portid="6379"><state state="open"/><service name="redis" product="Redis" version="6.2.7"/></port>
+    </ports>
+  </host>
+  <host>
+    <address addr="192.0.2.12" addrtype="ipv4"/>
+    <hostnames><hostname name="legacy-01.example.internal" type="PTR"/></hostnames>
+    <ports>
+      <port protocol="tcp" portid="21"><state state="open"/><service name="ftp" product="vsftpd" version="2.3.4"/></port>
+      <port protocol="tcp" portid="23"><state state="open"/><service name="telnet" product="Linux telnetd"/></port>
+      <port protocol="tcp" portid="445"><state state="open"/><service name="microsoft-ds" product="Samba smbd" version="3.6.23"/></port>
+      <port protocol="tcp" portid="3389"><state state="open"/><service name="ms-wbt-server" product="Microsoft Terminal Services"/></port>
+    </ports>
+  </host>
+  <host>
+    <address addr="192.0.2.13" addrtype="ipv4"/>
+    <hostnames><hostname name="ci-01.example.internal" type="PTR"/></hostnames>
+    <ports>
+      <port protocol="tcp" portid="22"><state state="open"/><service name="ssh" product="OpenSSH" version="9.2p1"/></port>
+      <port protocol="tcp" portid="2375"><state state="open"/><service name="docker" product="Docker" version="24.0.2"/></port>
+      <port protocol="tcp" portid="8081"><state state="open"/><service name="http" product="nginx" version="1.24.0"/></port>
+    </ports>
+  </host>
+</nmaprun>

@@ -1,0 +1,183 @@
+[
+  {
+    "bundle_id": "entry:app.import_data",
+    "title": "Insecure deserialization of request body with pickle",
+    "category": "A08 Software and Data Integrity Failures",
+    "severity": "critical",
+    "entry_point": "POST /import",
+    "path": [
+      "app.import_data (app.py:81-85)"
+    ],
+    "sink_line": 84,
+    "evidence": "blob = request.get_data(); obj = pickle.loads(blob)",
+    "attack_path": "Unauthenticated POST body is passed raw to pickle.loads. A crafted pickle stream executes arbitrary code during deserialization; this is unauthenticated remote code execution.",
+    "fix": "Never unpickle network input. Accept JSON instead, validate it against a schema, and if binary payloads are unavoidable, sign them and verify the signature before loading.",
+    "verdict": "confirmed",
+    "adjusted_severity": null,
+    "verifier_notes": "Each hop connects: the entry point reads attacker input and it reaches the sink with no validation anywhere along the bundle.",
+    "validation_steps": "Trigger the route with the class-typical probe (a quote, a metacharacter, or a traversal sequence) and observe the unsafe behavior in the response or on the host.",
+    "cluster": "A08 Software and Data Integrity Failures @ app.py:84",
+    "key": "52dc5435df55"
+  },
+  {
+    "bundle_id": "entry:app.ping",
+    "title": "OS command injection in ping endpoint",
+    "category": "A03 Injection",
+    "severity": "critical",
+    "entry_point": "GET /ping",
+    "path": [
+      "app.ping (app.py:57-61)"
+    ],
+    "sink_line": 60,
+    "evidence": "subprocess.check_output(\"ping -c 1 \" + host, shell=True)",
+    "attack_path": "Unauthenticated GET parameter 'host' is concatenated into a shell command. /ping?host=127.0.0.1;id executes arbitrary commands as the app user, and output is reflected back in the response.",
+    "fix": "Drop shell=True and pass an argument list (subprocess.check_output(['ping','-c','1',host])), plus strict input validation (IP/hostname allowlist pattern).",
+    "verdict": "confirmed",
+    "adjusted_severity": null,
+    "verifier_notes": "Each hop connects: the entry point reads attacker input and it reaches the sink with no validation anywhere along the bundle.",
+    "validation_steps": "Trigger the route with the class-typical probe (a quote, a metacharacter, or a traversal sequence) and observe the unsafe behavior in the response or on the host.",
+    "cluster": "A03 Injection @ app.py:60",
+    "key": "c96487df0aec"
+  },
+  {
+    "bundle_id": "entry:app.user_lookup",
+    "title": "SQL injection via string-formatted query",
+    "category": "A03 Injection",
+    "severity": "critical",
+    "entry_point": "GET /user",
+    "path": [
+      "app.user_lookup (app.py:47-53)",
+      "app.get_db (app.py:32-33)"
+    ],
+    "sink_line": 51,
+    "evidence": "query = \"SELECT id, username, role FROM users WHERE username = '%s'\" % username; rows = conn.execute(query).fetchall()",
+    "attack_path": "Unauthenticated GET parameter 'username' is formatted into a SQL string and executed by the get_db() connection. /user?username=' OR '1'='1 dumps the users table, and the response even echoes the raw query back to the attacker.",
+    "fix": "Use parameterized queries (conn.execute('... WHERE username = ?', (username,))) and never echo the query string in responses.",
+    "verdict": "confirmed",
+    "adjusted_severity": null,
+    "verifier_notes": "Each hop connects: the entry point reads attacker input and it reaches the sink with no validation anywhere along the bundle.",
+    "validation_steps": "Trigger the route with the class-typical probe (a quote, a metacharacter, or a traversal sequence) and observe the unsafe behavior in the response or on the host.",
+    "cluster": "A03 Injection @ app.py:51",
+    "key": "e660b6f9e33c"
+  },
+  {
+    "bundle_id": "entry:app.__main__",
+    "title": "Flask debug mode enabled at startup",
+    "category": "A05 Security Misconfiguration",
+    "severity": "high",
+    "entry_point": "cli-main (app.py:97)",
+    "path": [
+      "app.__main__ (app.py:97-99)"
+    ],
+    "sink_line": 99,
+    "evidence": "app.run(host=\"127.0.0.1\", port=5050, debug=True)",
+    "attack_path": "Anyone able to reach port 5050 and trigger an exception gets the Werkzeug interactive debugger, which executes arbitrary Python in the app process. The loopback binding narrows exposure to local actors and SSRF-style pivots but does not remove it.",
+    "fix": "Never run debug=True outside local development; drive it from an env var defaulting to off, and put a startup assertion in front of it.",
+    "verdict": "confirmed",
+    "adjusted_severity": "medium",
+    "verifier_notes": "Path is real (app.run with debug=True at line 99), but the loopback binding means remote exploitation requires a local foothold or an SSRF pivot; impact stays severe once reachable, likelihood is reduced.",
+    "validation_steps": "Start the app, curl http://127.0.0.1:5050/report to trigger an exception, and observe the Werkzeug debugger console PIN prompt.",
+    "cluster": "A05 Security Misconfiguration @ app.py:99",
+    "key": "5a6e9cef9713"
+  },
+  {
+    "bundle_id": "entry:app.download",
+    "title": "Path traversal in file download",
+    "category": "A01 Broken Access Control",
+    "severity": "high",
+    "entry_point": "GET /download",
+    "path": [
+      "app.download (app.py:65-68)"
+    ],
+    "sink_line": 68,
+    "evidence": "name = request.args.get(\"name\", \"notes.txt\"); send_file(os.path.join(\"/tmp/uploads\", name))",
+    "attack_path": "Unauthenticated GET parameter 'name' is joined into a filesystem path with no validation. /download?name=../../../../etc/passwd escapes /tmp/uploads and reads arbitrary files the process can open.",
+    "fix": "Resolve with os.path.realpath and require the result to stay under the uploads directory (os.path.commonpath), or map names to an allowlist of known files.",
+    "verdict": "confirmed",
+    "adjusted_severity": null,
+    "verifier_notes": "Each hop connects: the entry point reads attacker input and it reaches the sink with no validation anywhere along the bundle.",
+    "validation_steps": "Trigger the route with the class-typical probe (a quote, a metacharacter, or a traversal sequence) and observe the unsafe behavior in the response or on the host.",
+    "cluster": "A01 Broken Access Control @ app.py:68",
+    "key": "2ec6c7980440"
+  },
+  {
+    "bundle_id": "entry:app.greet",
+    "title": "Server-side template injection in greeting",
+    "category": "A03 Injection",
+    "severity": "high",
+    "entry_point": "GET /greet",
+    "path": [
+      "app.greet (app.py:72-77)"
+    ],
+    "sink_line": 76,
+    "evidence": "template = \"<h1>Hello \" + name + \"!</h1>\"; render_template_string(template)",
+    "attack_path": "Unauthenticated GET parameter 'name' is concatenated into the Jinja2 template source itself, so payload {{7*7}} evaluates, and Jinja globals (e.g. {{config}} or {{''.__class__.__mro__}} chains) expose secrets or code execution.",
+    "fix": "Pass user input as template data, not template source: render_template_string('<h1>Hello {{ name }}!</h1>', name=name).",
+    "verdict": "confirmed",
+    "adjusted_severity": null,
+    "verifier_notes": "Each hop connects: the entry point reads attacker input and it reaches the sink with no validation anywhere along the bundle.",
+    "validation_steps": "Trigger the route with the class-typical probe (a quote, a metacharacter, or a traversal sequence) and observe the unsafe behavior in the response or on the host.",
+    "cluster": "A03 Injection @ app.py:76",
+    "key": "912e32cb1cb1"
+  },
+  {
+    "bundle_id": "module:app.py",
+    "title": "Hardcoded API key in source",
+    "category": "A02 Cryptographic Failures",
+    "severity": "high",
+    "entry_point": "module import / startup (app.py)",
+    "path": [
+      "app.py module level (app.py:26)"
+    ],
+    "sink_line": 26,
+    "evidence": "API_KEY = \"sk-live-9f8e7d6c5b4a3210HARDCODED\"",
+    "attack_path": "A live-format API key committed to source is compromised the moment it is committed; anyone with repo read access holds it, and git history keeps it after deletion.",
+    "fix": "Move secrets to environment variables or a secrets manager, and rotate this key now.",
+    "verdict": "confirmed",
+    "adjusted_severity": null,
+    "verifier_notes": "Each hop connects: the entry point reads attacker input and it reaches the sink with no validation anywhere along the bundle.",
+    "validation_steps": "Trigger the route with the class-typical probe (a quote, a metacharacter, or a traversal sequence) and observe the unsafe behavior in the response or on the host.",
+    "cluster": "A02 Cryptographic Failures @ app.py:26",
+    "key": "f52a3e230c75"
+  },
+  {
+    "bundle_id": "module:app.py",
+    "title": "Hardcoded Flask session secret",
+    "category": "A02 Cryptographic Failures",
+    "severity": "high",
+    "entry_point": "module import / startup (app.py)",
+    "path": [
+      "app.py module level (app.py:27)"
+    ],
+    "sink_line": 27,
+    "evidence": "app.secret_key = \"password123\"",
+    "attack_path": "A guessable, committed session secret lets anyone forge Flask session cookies, impersonating any user and tampering with session data.",
+    "fix": "Load the secret from the environment with a strong random value per environment; rotate on suspicion.",
+    "verdict": "confirmed",
+    "adjusted_severity": null,
+    "verifier_notes": "Each hop connects: the entry point reads attacker input and it reaches the sink with no validation anywhere along the bundle.",
+    "validation_steps": "Trigger the route with the class-typical probe (a quote, a metacharacter, or a traversal sequence) and observe the unsafe behavior in the response or on the host.",
+    "cluster": "A02 Cryptographic Failures @ app.py:27",
+    "key": "451b34274f08"
+  },
+  {
+    "bundle_id": "entry:app.report",
+    "title": "Error response leaks internals (DB path, API key prefix)",
+    "category": "A05 Security Misconfiguration",
+    "severity": "medium",
+    "entry_point": "GET /report",
+    "path": [
+      "app.report (app.py:89-94)"
+    ],
+    "sink_line": 94,
+    "evidence": "return f\"debug trace: {exc!r} db={DB_PATH} key={API_KEY[:12]}...\", 500",
+    "attack_path": "Unauthenticated requests receive exception details, the database path, and the first 12 characters of the API key, which aids key-guessing and maps internals for follow-on attacks.",
+    "fix": "Return a generic error page to clients and log the detailed trace server-side only; never include secret material, even prefixes, in responses.",
+    "verdict": "unverified",
+    "adjusted_severity": null,
+    "verifier_notes": "",
+    "validation_steps": "",
+    "cluster": "A05 Security Misconfiguration @ app.py:94",
+    "key": "f9477d885000"
+  }
+]

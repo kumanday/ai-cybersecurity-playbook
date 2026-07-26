@@ -1,0 +1,19 @@
+{
+  "planner": "model",
+  "files": [
+    {
+      "file": "app.py",
+      "score": 31,
+      "reasons": [
+        "Dangerous default (debug/TLS verification off)",
+        "HTTP entry point",
+        "Hardcoded secret",
+        "Insecure deserialization",
+        "Possible OS command injection",
+        "Possible SQL injection via string formatting",
+        "Possible path traversal",
+        "Possible template/XSS injection"
+      ]
+    }
+  ]
+}

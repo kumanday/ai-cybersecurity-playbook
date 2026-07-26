@@ -1,0 +1,135 @@
+{
+  "coverage": {
+    "entry_points_total": 8,
+    "entry_points_bundled": 8,
+    "functions_total": 9,
+    "functions_in_bundles": 9,
+    "functions_not_covered": [],
+    "bundles_dropped_budget": []
+  },
+  "bundles": [
+    {
+      "bundle_id": "entry:app.__main__",
+      "kind": "entry",
+      "label": "(cli-main)",
+      "entry_point": "app.__main__",
+      "members": [
+        "app.__main__"
+      ],
+      "trimmed": false,
+      "sinks": [
+        "Dangerous default (debug/TLS verification off)"
+      ],
+      "chars": 196
+    },
+    {
+      "bundle_id": "entry:app.download",
+      "kind": "entry",
+      "label": "/download (http-route)",
+      "entry_point": "/download app.download",
+      "members": [
+        "app.download"
+      ],
+      "trimmed": false,
+      "sinks": [
+        "Possible path traversal"
+      ],
+      "chars": 256
+    },
+    {
+      "bundle_id": "entry:app.greet",
+      "kind": "entry",
+      "label": "/greet (http-route)",
+      "entry_point": "/greet app.greet",
+      "members": [
+        "app.greet"
+      ],
+      "trimmed": false,
+      "sinks": [
+        "Possible template/XSS injection"
+      ],
+      "chars": 339
+    },
+    {
+      "bundle_id": "entry:app.import_data",
+      "kind": "entry",
+      "label": "/import (http-route)",
+      "entry_point": "/import app.import_data",
+      "members": [
+        "app.import_data"
+      ],
+      "trimmed": false,
+      "sinks": [
+        "Insecure deserialization"
+      ],
+      "chars": 258
+    },
+    {
+      "bundle_id": "entry:app.ping",
+      "kind": "entry",
+      "label": "/ping (http-route)",
+      "entry_point": "/ping app.ping",
+      "members": [
+        "app.ping"
+      ],
+      "trimmed": false,
+      "sinks": [
+        "Possible OS command injection"
+      ],
+      "chars": 322
+    },
+    {
+      "bundle_id": "entry:app.user_lookup",
+      "kind": "entry",
+      "label": "/user (http-route)",
+      "entry_point": "/user app.user_lookup",
+      "members": [
+        "app.user_lookup",
+        "app.get_db"
+      ],
+      "trimmed": false,
+      "sinks": [
+        "Possible SQL injection via string formatting"
+      ],
+      "chars": 657
+    },
+    {
+      "bundle_id": "module:app.py",
+      "kind": "module-level",
+      "label": "module-level statements (app.py)",
+      "entry_point": "module import / startup (app.py)",
+      "members": [
+        "app.py"
+      ],
+      "trimmed": false,
+      "sinks": [
+        "Hardcoded secret"
+      ],
+      "chars": 1422
+    },
+    {
+      "bundle_id": "entry:app.index",
+      "kind": "entry",
+      "label": "/ (http-route)",
+      "entry_point": "/ app.index",
+      "members": [
+        "app.index"
+      ],
+      "trimmed": false,
+      "sinks": [],
+      "chars": 145
+    },
+    {
+      "bundle_id": "entry:app.report",
+      "kind": "entry",
+      "label": "/report (http-route)",
+      "entry_point": "/report app.report",
+      "members": [
+        "app.report"
+      ],
+      "trimmed": false,
+      "sinks": [],
+      "chars": 279
+    }
+  ]
+}
