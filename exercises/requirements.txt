@@ -1,6 +1,6 @@
 # The exercise scripts keep dependencies minimal and pinned (see the
 # playbook's supply-chain chapter: pin everything).
-requests==2.32.3
+requests==2.33.0
 
 # Structural code analysis for repo_index.py / path_audit.py (Lab 8).
 # Tree-sitter is the standard incremental parser library for multi-language
