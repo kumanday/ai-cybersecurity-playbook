@@ -3,8 +3,8 @@
 Practical controls, agentic testing workflows, and incident-response exercises
 for builders, operators, and security professionals.
 
-- [Read the interactive playbook](https://trilogy-group.github.io/ai-cybersecurity-playbook/)
-- [Open the exercise pack](https://github.com/trilogy-group/ai-cybersecurity-playbook/tree/main/exercises)
+- [Read the interactive playbook](https://kumanday.github.io/ai-cybersecurity-playbook/)
+- [Open the exercise pack](https://github.com/kumanday/ai-cybersecurity-playbook/tree/main/exercises)
 
 ## Run the exercises
 
